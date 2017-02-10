@@ -6,6 +6,9 @@
 ##  FILE:  .bashrc-amendments, also named dot-bashrc-amendments.sh
 ##
 ##
+##  LAST TOUCHED:  2017-02-10 FRI
+##
+##
 ##  DESCRIPTION:  short script to amend Debian and Ubuntu and or
 ##    Bourne shell run-time config file, normally named '.bashrc'.
 ##    Adds directory book-marking for up to thirty directories -- or
