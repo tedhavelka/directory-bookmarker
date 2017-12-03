@@ -615,8 +615,14 @@ fi
 
 bookmarks_dir=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}
 
-if [ -e ${booksmarks_dir} ]; then
-    echo "found directory for bookmarked path files, not creating this directory."
+echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
+## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when 
+## +  the argument to the file test is a zero-length string?  Or undefined variable?
+## +  Does Mendel Cooper's guide explain this behavior?  There was a type 
+## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
+
+if [ -e ${bookmarks_dir} ]; then
+    echo "found directory '${booksmarks_dir}' for bookmarked path files, not creating this directory."
 else
     echo "creating directory ${bookmarks_dir} . . ."
     mkdir -pv ${bookmarks_dir}
@@ -632,9 +638,9 @@ fi
 
     set_aliases_for_bookmarking
 
- echo "- DIAG BEGIN - calling builtin shell command 'alias' to check aliases just set:"
- alias
-    echo "- DIAG END -"
+#    echo "- DIAG BEGIN - calling builtin shell command 'alias' to check aliases just set:"
+#    alias
+#    echo "- DIAG END -"
 
 
 
