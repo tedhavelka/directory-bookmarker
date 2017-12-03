@@ -31,8 +31,6 @@
 ##
 ##
 ##
-##
-##
 ##  TO DO:
 ##
 ##    [ ]  add to this script function which detects and shows
@@ -48,13 +46,37 @@
 ##         holds and status of whether each given bookmark exists
 ##         as a valid path on the local file system,
 ##
+##    [ ]  2017-12-02 - add parameters sanity check to routine 'read_bookmarks_file',
+##
+##    [ ]  2017-12-02 - add settings file to store latest selected group of bookmarks,
 ##
 ##
+##
+##
+##
+##  TO CONFIRM:
+##
+##    [ ]  2017-12-02 - make sure that variable 'index' is visible in 
+##         the scope of the script which sets the alias 'sp' which
+##         saves bookmarked paths,
+##
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 ##
 ##
 ##  REFERENCES:
 ##
 ##    See 'The Linux Documentation Project' at http://tldp.org/
+##
+##    *  http://tldp.org/LDP/abs/html/testconstructs.html . . . [, [[ ]], (( )) - builtin test,
+##         extended test, arithmetic test in bash context
+##
+##    *  http://tldp.org/LDP/abs/html/testbranch.html     . . . note shell 'shift' parameters operator
+##
+##    *  http://tldp.org/LDP/abs/html/complexfunct.html   . . . $1 $2 are first parameters to shell functions
+##
+##    *  http://www.grymoire.com/Unix/Sed.html
 ##
 ##
 ##
@@ -68,24 +90,602 @@
 
 
 
+##----------------------------------------------------------------------
+##  SECTION - script variables of directory-bookmarker project
+##----------------------------------------------------------------------
+
+# SCRIPT VARS BEGIN
+
 GREP=/bin/grep
+SED=/bin/sed
+
+
+SCRIPT_NAME=${0}
+echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
+SCRIPT_NAME="dot-bash-amendments.sh"
+
+DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
+
+FILENAME_FORM_OF_BOOKMARKED_PATHS="bookmarked-paths-nn.txt"
+
+FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
+
+# . . .
+bookmarks_group=1
+
+# Shell variable used in 'sp' alias to save bookmarked paths:
+index=0
+
+
+## 2017-12-02 - How are these variables used? - TMH
+bash_settings_file="${HOME}/.bash_settings_local"
+
+
+# SCRIPT VARS END
 
 
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  SECTION - aliases
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+##----------------------------------------------------------------------
+##  SECTION - script functions
+##----------------------------------------------------------------------
 
 function show_aliases_in_this_script()
 {
+## 2017-12-02 NEED - Contributor Ted noting that following command will
+##  show all script lines, including comments and commented out
+##  commands (which are also comments), which this function's name
+##  does not indicate.  NEED to fix this or rename this function . . .
+
     $(GREP) -n alias $0
 }
 
 
 
+function set_aliases()
+{
+##----------------------------------------------------------------------
+##  PURPOSE: . . .
+##----------------------------------------------------------------------
+
+    echo "setting some shell safety and shortcut aliases . . ."
+
+
+## Some important shell safe-guarding aliases for Unix and Linux systems:
+
+    alias rm='rm -i'
+    alias cp='cp -i'
+    alias mv='mv -i'
+
+# list files in long format starting from a cleared screen:
+    alias lss='clear; ls -lF'
+
+# list directories only in long format:
+    alias dls='ls -l | grep "^d"'
+
+
+
+# run custom Remote UPtime script:
+    alias rup='${HOME}/bin/rup'
+
+# . . .
+    alias cvs='cvs -d ${HOME}/cvs -e /usr/bin/vi'
+
+
+# Shell shortcuts to cd to local oft used directories:
+
+    alias archive='cd ${HOME}/archive; echo "Now at `pwd`" '
+    alias bin='cd ${HOME}/bin; echo "Now at `pwd`" '
+    alias notes='cd ${HOME}/notes; echo "Now at `pwd`" '
+
+
+# 2012-01-25
+
+    alias xterm='xterm -bg black -fg white -geometry 108x36'
+    alias x='xterm -bg black -fg white -geometry 115x36 &'
+
+
+# NOTE 2017-12-02 - xlock command generally not available on last
+#  three years' Debian and Ubuntu software package mirrors.  Related
+#  command 'xscreensaver-command -lock' is installable . . .
+
+    alias xlock='/usr/bin/xlock -mode scooter -count 100'
+
+
+
+} # end function set_aliases()
+
+
+
+
+function set_aliases_for_bookmarking()
+{
+
+    echo "setting aliases for bookmarking of paths . . ."
+
+#---------------------------------------------------------------------
+# STEP:  create aliases for saving paths and returning to paths
+#---------------------------------------------------------------------
+
+# setting of bookmarks 1 through 10:
+
+    alias sd1='export D1=`pwd`; echo "Set variable D1 to `pwd`" '
+    alias sd2='export D2=`pwd`; echo "Set variable D2 to `pwd`" '
+    alias sd3='export D3=`pwd`; echo "Set variable D3 to `pwd`" '
+    alias sd4='export D4=`pwd`; echo "Set variable D4 to `pwd`" '
+    alias sd5='export D5=`pwd`; echo "Set variable D5 to `pwd`" '
+
+    alias sd6='export D6=`pwd`; echo "Set variable D6 to `pwd`" '
+    alias sd7='export D7=`pwd`; echo "Set variable D7 to `pwd`" '
+    alias sd8='export D8=`pwd`; echo "Set variable D8 to `pwd`" '
+    alias sd9='export D9=`pwd`; echo "Set variable D9 to `pwd`" '
+    alias sd10='export D10=`pwd`; echo "Set variable D10 to `pwd`" '
+
+# setting of bookmarks 11 through 20:
+
+    alias sd11='export D11=`pwd`; echo "Set variable D11 to `pwd`" '
+    alias sd12='export D12=`pwd`; echo "Set variable D12 to `pwd`" '
+    alias sd13='export D13=`pwd`; echo "Set variable D13 to `pwd`" '
+    alias sd14='export D14=`pwd`; echo "Set variable D14 to `pwd`" '
+    alias sd15='export D15=`pwd`; echo "Set variable D15 to `pwd`" '
+
+    alias sd16='export D16=`pwd`; echo "Set variable D16 to `pwd`" '
+    alias sd17='export D17=`pwd`; echo "Set variable D17 to `pwd`" '
+    alias sd18='export D18=`pwd`; echo "Set variable D18 to `pwd`" '
+    alias sd19='export D19=`pwd`; echo "Set variable D19 to `pwd`" '
+    alias sd20='export D20=`pwd`; echo "Set variable D20 to `pwd`" '
+
+# setting of bookmarks 21 through 30:
+
+    alias sd21='export D21=`pwd`; echo "Set variable D21 to `pwd`" '
+    alias sd22='export D22=`pwd`; echo "Set variable D22 to `pwd`" '
+    alias sd23='export D23=`pwd`; echo "Set variable D23 to `pwd`" '
+    alias sd24='export D24=`pwd`; echo "Set variable D24 to `pwd`" '
+    alias sd25='export D25=`pwd`; echo "Set variable D25 to `pwd`" '
+
+    alias sd26='export D26=`pwd`; echo "Set variable D26 to `pwd`" '
+    alias sd27='export D27=`pwd`; echo "Set variable D27 to `pwd`" '
+    alias sd28='export D28=`pwd`; echo "Set variable D28 to `pwd`" '
+    alias sd29='export D29=`pwd`; echo "Set variable D29 to `pwd`" '
+    alias sd30='export D30=`pwd`; echo "Set variable D30 to `pwd`" '
+
+
+
+# navigation to bookmarked directories 1 through 10:
+
+    alias gd1='cd $D1; echo "Now at $D1" '
+    alias gd2='cd $D2; echo "Now at $D2" '
+    alias gd3='cd $D3; echo "Now at $D3" '
+    alias gd4='cd $D4; echo "Now at $D4" '
+    alias gd5='cd $D5; echo "Now at $D5" '
+
+    alias gd6='cd $D6; echo "Now at $D6" '
+    alias gd7='cd $D7; echo "Now at $D7" '
+    alias gd8='cd $D8; echo "Now at $D8" '
+    alias gd9='cd $D9; echo "Now at $D9" '
+    alias gd10='cd $D10; echo "Now at $D10" '
+
+# navigation to bookmarked directories 11 through 20:
+
+    alias gd11='cd $D11; echo "Now at $D11" '
+    alias gd12='cd $D12; echo "Now at $D12" '
+    alias gd13='cd $D13; echo "Now at $D13" '
+    alias gd14='cd $D14; echo "Now at $D14" '
+    alias gd15='cd $D15; echo "Now at $D15" '
+
+    alias gd16='cd $D16; echo "Now at $D16" '
+    alias gd17='cd $D17; echo "Now at $D17" '
+    alias gd18='cd $D18; echo "Now at $D18" '
+    alias gd19='cd $D19; echo "Now at $D19" '
+    alias gd20='cd $D20; echo "Now at $D20" '
+
+# navigation to bookmarked directories 21 through 30:
+
+    alias gd21='cd $D21; echo "Now at $D21" '
+    alias gd22='cd $D22; echo "Now at $D22" '
+    alias gd23='cd $D23; echo "Now at $D23" '
+    alias gd24='cd $D24; echo "Now at $D24" '
+    alias gd25='cd $D25; echo "Now at $D25" '
+
+    alias gd26='cd $D26; echo "Now at $D26" '
+    alias gd27='cd $D27; echo "Now at $D27" '
+    alias gd28='cd $D28; echo "Now at $D28" '
+    alias gd29='cd $D29; echo "Now at $D29" '
+    alias gd30='cd $D30; echo "Now at $D30" '
+
+
+
+
+
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  SECTION - path environment variable amendments, mostly for
+##  Banner message at end of alias 's' . . .
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+alias s='\
+echo " - - - - -";\
+\
+echo "variable D1 points to $D1";\
+ echo variable D2 points to $D2; echo variable D3 points to $D3; echo variable D4 points to $D4; echo variable D5 points to $D5; echo variable D6 points to $D6; echo variable D7 points to $D7; echo variable D8 points to $D8; echo variable D9 points to $D9; echo variable D10 points to $D10;\
+\
+echo " - - - - -";\
+\
+echo variable D11 points to $D11; echo variable D12 points to $D12; echo variable D13 points to $D13; echo variable D14 points to $D14; echo variable D15 points to $D15; echo variable D16 points to $D16; echo variable D17 points to $D17; echo variable D18 points to $D18; echo variable D19 points to $D19; echo variable D20 points to $D20;\
+\
+echo " - - - - -";\
+\
+echo "variable D21 points to $D21";\
+echo "variable D22 points to $D22";\
+echo "variable D23 points to $D23";\
+echo "variable D24 points to $D24";\
+echo "variable D25 points to $D25";\
+\
+echo "variable D26 points to $D26";\
+echo "variable D27 points to $D27";\
+echo "variable D28 points to $D28";\
+echo "variable D29 points to $D29";\
+echo "variable D30 points to $D30";\
+\
+echo " - - - - -";\
+\
+# echo CVSROOT is set to: $CVSROOT; # echo CVS_RSH is set to: $CVS_RSH;\
+echo EDITOR is set to: $EDITOR;\
+echo "see file dot-bashrc-amendments.sh, typically in home directory of present user,";\
+echo "for implementation of directory bookmarks and D1..D30 variables - TMH";\
+echo "this shell script written by Ted Havelka and licensed under GNU Public License, 2005 - 2017";\
+\
+echo " - - - - -";'
+
+##------------------------------------------------------------------------------
+
+
+
+
+
+alias sp='pathlist[0]="zztop"; 
+   pathlist[1]=$D1;    pathlist[2]=$D2;    pathlist[3]=$D3;    pathlist[4]=$D4;    pathlist[5]=$D5; 
+   pathlist[6]=$D6;    pathlist[7]=$D7;    pathlist[8]=$D8;    pathlist[9]=$D9;   pathlist[10]=$D10; 
+
+  pathlist[11]=$D11;  pathlist[12]=$D12;  pathlist[13]=$D13;  pathlist[14]=$D14;  pathlist[15]=$D15; 
+  pathlist[16]=$D16;  pathlist[17]=$D17;  pathlist[18]=$D18;  pathlist[19]=$D19;  pathlist[20]=$D20; 
+
+  pathlist[21]=$D21;  pathlist[22]=$D22;  pathlist[23]=$D23;  pathlist[24]=$D24;  pathlist[25]=$D25; 
+  pathlist[26]=$D26;  pathlist[27]=$D27;  pathlist[28]=$D28;  pathlist[29]=$D29;  pathlist[30]=$D30; 
+
+  echo "to local file $filename saving bookmarked directories:";
+  echo -n > $filename; 
+  for index in 0  1 2 3 4 5 6 7 8 9 10  11 12 13 14 15 16 17 18 19 20  21 22 23 24 25 26 27 28 29 30; do
+      echo "saving bookmarked path $index = ${pathlist[$index]}"; 
+      echo ${pathlist[$index]} >> $filename; 
+  done'
+
+
+
+# alias clear-paths='\
+alias clearpaths='\
+export D1=""; export D2=""; export D3=""; export D4=""; export D5=""; \
+export D6=""; export D7=""; export D8=""; export D9=""; export D10=""; \
+\
+export D11=""; export D12=""; export D13=""; export D14=""; export D15=""; \
+export D16=""; export D17=""; export D18=""; export D19=""; export D20=""; \
+\
+export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
+export D26=""; export D27=""; export D28=""; export D29=""; export D30="";'
+
+
+
+# 2017-12-02 - NEED TO ADDRESS INTENT AND ACTION OF load-paths:
+# This alias likely doesn't work as intended, to load one set
+# of bookmarked paths over others . . .    - TMH
+
+alias load-paths=' \
+export D1=${pathlist[1]}; \
+export D2=${pathlist[2]}; \
+export D3=${pathlist[3]}; \
+export D4=${pathlist[4]}; \
+export D5=${pathlist[5]}; \
+export D6=${pathlist[6]}; \
+export D7=${pathlist[7]}; \
+export D8=${pathlist[8]}; \
+export D9=${pathlist[9]}; \
+export D10=${pathlist[10]}; \
+\
+export D11=${pathlist[11]}; \
+export D12=${pathlist[12]}; \
+export D13=${pathlist[13]}; \
+export D14=${pathlist[14]}; \
+export D15=${pathlist[15]}; \
+export D16=${pathlist[16]}; \
+export D17=${pathlist[17]}; \
+export D18=${pathlist[18]}; \
+export D19=${pathlist[19]}; \
+export D20=${pathlist[20]}; \
+\
+export D21=${pathlist[21]}; \
+export D22=${pathlist[22]}; \
+export D23=${pathlist[23]}; \
+export D24=${pathlist[24]}; \
+export D25=${pathlist[25]}; \
+export D26=${pathlist[26]}; \
+export D27=${pathlist[27]}; \
+export D28=${pathlist[28]}; \
+export D29=${pathlist[29]}; \
+export D30=${pathlist[30]}; \
+echo "Loaded user-saved paths:"; s'
+
+
+# Aliases to load different groups of bookmarked paths:
+
+    alias lp1='. ${HOME}/dot-bashrc-amendments.sh 1'
+    alias lp2='. ${HOME}/dot-bashrc-amendments.sh 2'
+    alias lp3='. ${HOME}/dot-bashrc-amendments.sh 3'
+    alias lp4='. ${HOME}/dot-bashrc-amendments.sh 4'
+    alias lp5='. ${HOME}/dot-bashrc-amendments.sh 5'
+
+
+} # end function set_aliases_for_bookmarking()
+
+
+
+
+function read_bookmarks_runtime_config()
+{
+    echo "READ_BOOKMARKS_RUNTIME_CONFIG NOT YET IMPLEMENTED"
+
+    filename=${HOME}/${}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
+
+    if [ -e ${filename} ]; then
+        # read bookmarked paths runtime config file . . .
+        echo "${SCRIPT_NAME}:  reading directory bookmarks runtime configuration file . . ."
+        cat ${filename}
+    else
+        touch ${filename}
+        if [ -e ${filename} ]; then
+            echo "1" >> ${filename}
+        else
+            echo "${SCRIPT_NAME}:  - WARNING - unable to open and unable to create runtime config file!"
+            echo "${SCRIPT_NAME}:  - will start with bookmarks group set to 1,"
+            echo "${SCRIPT_NAME}:  - presently bookmarks groups 1 through 9 supported."
+        fi
+    fi
+}
+
+
+
+
+function read_bookmarks_file()
+{
+
+    echo "*** Routine 'read_bookmarks_file' development in progress, ***"
+    echo "first two arguments from caller are '$1' and '$2',"
+#    echo "variable \${SED} holds '${SED}',"
+
+    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${2}/)
+
+    echo "will read bookmarks from file named ${bookmarks_filename},"
+
+## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+##  NOTE - had trouble getting these export statements to fly . . .
+##
+##   Ahh finally makes sense now 2017 DEC, these export statements
+##   don't express explicit variable names.  That is, bash must see
+##   a shell script declared array element as something other than a
+##   valid variable name:                                         - TMH
+## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+# export ${pathlist[0]}
+# export ${pathlist[1]}
+# export ${pathlist[2]}
+# export ${pathlist[3]}
+# export ${pathlist[4]}
+# export ${pathlist[5]}
+
+
+
+##----------------------------------------------------------------------
+##  STEP:  retrieve saved paths from previous user session
+##----------------------------------------------------------------------
+
+# filename="${HOME}/.bash_paths_saved"
+# filename="${HOME}/bookmarked-paths.txt"  . . . commmented 2017-12-02 SAT
+filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${bookmarks_filename}
+
+## 2017-02-09 THU - To be added, support for storing and perusing multiple directory bookmarks files:
+filename__list_of_bookmark_files="${HOME}/bookmarked-path-files.txt"
+
+
+
+# REFERENCE:  http://tldp.org/LDP/abs/html/arrays.html
+
+declare -a pathlist=()
+
+
+
+if [ -e ${filename} ]; then
+    pathlist=( $(cat "$filename") )  #  Stores contents of this script
+                                     #+ ($bash_settings_local) in an array.
+else
+#    echo "$O:  no local bash settings file named ${bash_settings_file} found," > /dev/null
+    echo "${SCRIPT_NAME}:  - WARNING - direcory bookmarks file named ${filename} not found!"
+    echo "${SCRIPT_NAME}:  - not able to read in bookmarked directories from this file,"
+    echo "${SCRIPT_NAME}:  - but creating to hold paths going forward . . ."
+    touch ${filename}
+    return
+fi
+
+
+    echo ""
+    echo "- DIAG START -"
+    echo "after reading bookmarks file,"
+    echo "\${pathlist[1]} holds '${pathlist[1]}'"
+    echo "\${pathlist[2]} holds '${pathlist[2]}'"
+    echo "\${pathlist[3]} holds '${pathlist[3]}'"
+    echo "- DIAG END -"
+    echo ""
+
+
+# 2006-11-27
+# Prior to storing user-saved paths in a local file, path
+# variables were assigned zero-length strings and exported like this:
+#
+# export D1=""
+#
+# Now these variables are exported the same way but assigned
+# differently . . .
+
+# echo "reading saved paths from file, skipping first place-holder token '${pathlist[0]}' . . ."
+
+    export D1=${pathlist[1]}
+    export D2=${pathlist[2]}
+    export D3=${pathlist[3]}
+    export D4=${pathlist[4]}
+    export D5=${pathlist[5]}
+
+    export D6=${pathlist[6]}
+    export D7=${pathlist[7]}
+    export D8=${pathlist[8]}
+    export D9=${pathlist[9]}
+    export D10=${pathlist[10]}
+
+    export D11=${pathlist[11]}
+    export D12=${pathlist[12]}
+    export D13=${pathlist[13]}
+    export D14=${pathlist[14]}
+    export D15=${pathlist[15]}
+
+    export D16=${pathlist[16]}
+    export D17=${pathlist[17]}
+    export D18=${pathlist[18]}
+    export D19=${pathlist[19]}
+    export D20=${pathlist[20]}
+
+    export D21=${pathlist[21]}
+    export D22=${pathlist[22]}
+    export D23=${pathlist[23]}
+    export D24=${pathlist[24]}
+    export D25=${pathlist[25]}
+
+    export D26=${pathlist[26]}
+    export D27=${pathlist[27]}
+    export D28=${pathlist[28]}
+    export D29=${pathlist[29]}
+    export D30=${pathlist[30]}
+
+
+    echo ""
+    echo "- DIAG START -"
+    echo "after exporting \$D1..\$D30,"
+    echo "\$D1 holds '$D1',"
+    echo "\$D2 holds '$D2',"
+    echo "\$D3 holds '$D3',"
+    echo "- DIAG END -"
+    echo ""
+
+
+} # end function read_bookmarks_file()
+
+
+
+
+##----------------------------------------------------------------------
+##
+##  SECTION - main-line code of dot-bash-amendments.sh
+##
+##----------------------------------------------------------------------
+
+echo "starting,"
+
+## Following test fails when script passed an argument, should succeed . . .
+#if [[ "$ARGC" -eq "1" ]]; then
+#    echo "called with first argument set to '$1',"
+#fi
+
+## Following test succeeds:
+if [[ "$#" -eq "1" ]]; then
+    echo "called with first argument set to '$1',"
+#    echo "calling 'read directory bookmarks file' with no arguments . . ."
+#    read_bookmarks_file
+fi
+
+
+
+## Note:  single brackets in the following test work, double brackets
+##  seem to evaulate differently, may be because we're using a shell
+##  file test . . .
+
+bookmarks_dir=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}
+
+if [ -e ${booksmarks_dir} ]; then
+    echo "found directory for bookmarked path files, not creating this directory."
+else
+    echo "creating directory ${bookmarks_dir} . . ."
+    mkdir -pv ${bookmarks_dir}
+fi
+
+
+
+##----------------------------------------------------------------------
+##  STEP:  set shell aliases . . . moved to two functions of this script
+##----------------------------------------------------------------------
+
+    set_aliases
+
+    set_aliases_for_bookmarking
+
+ echo "- DIAG BEGIN - calling builtin shell command 'alias' to check aliases just set:"
+ alias
+    echo "- DIAG END -"
+
+
+
+##----------------------------------------------------------------------
+##  STEP - read file holding bookmarked paths
+##----------------------------------------------------------------------
+
+    echo "- DIAG BEGIN - calling alias 'clearpaths' to clear bookmarks:"
+#    clear-paths
+    clearpaths
+    echo "- DIAG END - \$D1 holds '$D1'"
+
+# if [[ "$#" -eq "1" ]]; then
+if [ "$#" -gt 0 ]; then
+    bookmarks_group=${1}
+else
+    bookmarks_group=1
+fi
+
+echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group}' . . ."
+read_bookmarks_file $0 ${bookmarks_group}
+
+
+    echo ""
+    echo "- DIAG START in main-line code of script -"
+    echo "back from call to read_bookmarks_file() which exports \$D1..\$D30,"
+    echo "\$D1 holds '$D1',"
+    echo "\$D2 holds '$D2',"
+    echo "\$D3 holds '$D3',"
+    echo "- DIAG END in main-line code of script -"
+    echo ""
+
+
+
+##----------------------------------------------------------------------
+##  STEP:  set shell aliases . . . moved to two functions of this script
+##----------------------------------------------------------------------
+
+#    set_aliases
+
+#    set_aliases_for_bookmarking
+
+
+
+##----------------------------------------------------------------------
+##  STEP - amend environment variables
+##----------------------------------------------------------------------
+
+#
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+##  NOTE - path environment variable amendments, mostly for
 ##   work on Debian and Ubuntu Linux based systems
 ##
 ##
@@ -95,7 +695,7 @@ function show_aliases_in_this_script()
 ##   current working directory commented out.  Safer to run programs
 ##   in cwd using ./[program_name] syntax anyway . . .  - TMH
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+#
 
 # Amending the default path variable:
 
@@ -140,371 +740,6 @@ function show_aliases_in_this_script()
 
 
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  SECTION - aliases
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    alias rm='rm -i'
-    alias cp='cp -i'
-    alias mv='mv -i'
-
-# list files in long format starting from a cleared screen:
-    alias lss='clear; ls -lF'
-
-# list directories only in long format:
-    alias dls='ls -l | grep "^d"'
-
-# run custom Remote UPtime script:
-    alias rup='${HOME}/bin/rup'
-
-# . . .
-    alias cvs='cvs -d /home/ted/cvs -e /usr/bin/vi'
-
-
-
-    alias archive='cd ${HOME}/archive; echo "Now at `pwd`" '
-    alias bin='cd ${HOME}/bin; echo "Now at `pwd`" '
-    alias notes='cd ${HOME}/notes; echo "Now at `pwd`" '
-    alias docs='cd /var/www/alta/docs; echo "Now at `pwd`" '
-
-    alias alta='cd ${HOME}/alta; echo "Now at `pwd`" '
-
-
-# 2012-01-25
-    alias xterm='xterm -bg black -fg white -geometry 108x36'
-    alias x='xterm -bg black -fg white -geometry 115x36 &'
-
-    alias xlock='/usr/bin/xlock -mode scooter -count 100'
-
-
-
-
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  STEP:  retrieve saved paths from previous user session
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-line=""
-index=0
-bash_settings_file="${HOME}/.bash_settings_local"
-
-# filename="${HOME}/.bash_paths_saved"
-filename="${HOME}/bookmarked-paths.txt"
-filename__present_bookmarks=${filename}
-
-## 2017-02-09 THU - To be added, support for storing and perusing multiple directory bookmarks files:
-filename__list_of_bookmark_files="${HOME}/bookmarked-path-files.txt"
-
-
-
-
-
-declare -a pathlist=()
-
-if [ -e ${filename} ]; then
-    pathlist=( $(cat "$filename") )  #  Stores contents of this script
-                                     #+ ($bash_settings_local) in an array.
-else
-    echo "$O:  no local bash settings file named ${bash_settings_file} found," > /dev/null
-fi
-
-
-
-## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-##  NOTE - had trouble getting these export statements to fly . . .
-## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-
-# export ${pathlist[0]}
-# export ${pathlist[1]}
-# export ${pathlist[2]}
-# export ${pathlist[3]}
-# export ${pathlist[4]}
-# export ${pathlist[5]}
-
-
-# 2006-11-27
-# Prior to storing user-saved paths in a local file, path
-# variables were assigned zero-length strings and exported like this:
-#
-# export D1=""
-#
-# Now these variables are exported the same way but assigned
-# differently . . .
-
-# echo "reading saved paths from file, skipping first place-holder token '${pathlist[0]}' . . ."
-
-export D1=${pathlist[1]}
-export D2=${pathlist[2]}
-export D3=${pathlist[3]}
-export D4=${pathlist[4]}
-export D5=${pathlist[5]}
-
-export D6=${pathlist[6]}
-export D7=${pathlist[7]}
-export D8=${pathlist[8]}
-export D9=${pathlist[9]}
-export D10=${pathlist[10]}
-
-export D11=${pathlist[11]}
-export D12=${pathlist[12]}
-export D13=${pathlist[13]}
-export D14=${pathlist[14]}
-export D15=${pathlist[15]}
-
-export D16=${pathlist[16]}
-export D17=${pathlist[17]}
-export D18=${pathlist[18]}
-export D19=${pathlist[19]}
-export D20=${pathlist[20]}
-
-export D21=${pathlist[21]}
-export D22=${pathlist[22]}
-export D23=${pathlist[23]}
-export D24=${pathlist[24]}
-export D25=${pathlist[25]}
-
-export D26=${pathlist[26]}
-export D27=${pathlist[27]}
-export D28=${pathlist[28]}
-export D29=${pathlist[29]}
-export D30=${pathlist[30]}
-
-
-
-
-#---------------------------------------------------------------------
-# STEP:  create aliases for saving paths and returning to paths
-#---------------------------------------------------------------------
-
-# setting of bookmarks 1 through 10:
-
-alias sd1='export D1=`pwd`; echo "Set variable D1 to `pwd`" '
-alias sd2='export D2=`pwd`; echo "Set variable D2 to `pwd`" '
-alias sd3='export D3=`pwd`; echo "Set variable D3 to `pwd`" '
-alias sd4='export D4=`pwd`; echo "Set variable D4 to `pwd`" '
-alias sd5='export D5=`pwd`; echo "Set variable D5 to `pwd`" '
-
-alias sd6='export D6=`pwd`; echo "Set variable D6 to `pwd`" '
-alias sd7='export D7=`pwd`; echo "Set variable D7 to `pwd`" '
-alias sd8='export D8=`pwd`; echo "Set variable D8 to `pwd`" '
-alias sd9='export D9=`pwd`; echo "Set variable D9 to `pwd`" '
-alias sd10='export D10=`pwd`; echo "Set variable D10 to `pwd`" '
-
-# setting of bookmarks 11 through 20:
-
-alias sd11='export D11=`pwd`; echo "Set variable D11 to `pwd`" '
-alias sd12='export D12=`pwd`; echo "Set variable D12 to `pwd`" '
-alias sd13='export D13=`pwd`; echo "Set variable D13 to `pwd`" '
-alias sd14='export D14=`pwd`; echo "Set variable D14 to `pwd`" '
-alias sd15='export D15=`pwd`; echo "Set variable D15 to `pwd`" '
-
-alias sd16='export D16=`pwd`; echo "Set variable D16 to `pwd`" '
-alias sd17='export D17=`pwd`; echo "Set variable D17 to `pwd`" '
-alias sd18='export D18=`pwd`; echo "Set variable D18 to `pwd`" '
-alias sd19='export D19=`pwd`; echo "Set variable D19 to `pwd`" '
-alias sd20='export D20=`pwd`; echo "Set variable D20 to `pwd`" '
-
-# setting of bookmarks 21 through 30:
-
-alias sd21='export D21=`pwd`; echo "Set variable D21 to `pwd`" '
-alias sd22='export D22=`pwd`; echo "Set variable D22 to `pwd`" '
-alias sd23='export D23=`pwd`; echo "Set variable D23 to `pwd`" '
-alias sd24='export D24=`pwd`; echo "Set variable D24 to `pwd`" '
-alias sd25='export D25=`pwd`; echo "Set variable D25 to `pwd`" '
-
-alias sd26='export D26=`pwd`; echo "Set variable D26 to `pwd`" '
-alias sd27='export D27=`pwd`; echo "Set variable D27 to `pwd`" '
-alias sd28='export D28=`pwd`; echo "Set variable D28 to `pwd`" '
-alias sd29='export D29=`pwd`; echo "Set variable D29 to `pwd`" '
-alias sd30='export D30=`pwd`; echo "Set variable D30 to `pwd`" '
-
-
-
-# navigation to bookmarked directories 1 through 10:
-
-alias gd1='cd $D1; echo "Now at $D1" '
-alias gd2='cd $D2; echo "Now at $D2" '
-alias gd3='cd $D3; echo "Now at $D3" '
-alias gd4='cd $D4; echo "Now at $D4" '
-alias gd5='cd $D5; echo "Now at $D5" '
-
-alias gd6='cd $D6; echo "Now at $D6" '
-alias gd7='cd $D7; echo "Now at $D7" '
-alias gd8='cd $D8; echo "Now at $D8" '
-alias gd9='cd $D9; echo "Now at $D9" '
-alias gd10='cd $D10; echo "Now at $D10" '
-
-# navigation to bookmarked directories 11 through 20:
-
-alias gd11='cd $D11; echo "Now at $D11" '
-alias gd12='cd $D12; echo "Now at $D12" '
-alias gd13='cd $D13; echo "Now at $D13" '
-alias gd14='cd $D14; echo "Now at $D14" '
-alias gd15='cd $D15; echo "Now at $D15" '
-
-alias gd16='cd $D16; echo "Now at $D16" '
-alias gd17='cd $D17; echo "Now at $D17" '
-alias gd18='cd $D18; echo "Now at $D18" '
-alias gd19='cd $D19; echo "Now at $D19" '
-alias gd20='cd $D20; echo "Now at $D20" '
-
-# navigation to bookmarked directories 21 through 30:
-
-alias gd21='cd $D21; echo "Now at $D21" '
-alias gd22='cd $D22; echo "Now at $D22" '
-alias gd23='cd $D23; echo "Now at $D23" '
-alias gd24='cd $D24; echo "Now at $D24" '
-alias gd25='cd $D25; echo "Now at $D25" '
-
-alias gd26='cd $D26; echo "Now at $D26" '
-alias gd27='cd $D27; echo "Now at $D27" '
-alias gd28='cd $D28; echo "Now at $D28" '
-alias gd29='cd $D29; echo "Now at $D29" '
-alias gd30='cd $D30; echo "Now at $D30" '
-
-
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  SECTION - aliases to show, to save and to load bookmarked paths
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# alias s='echo variable D1 points to $D1; \
-# echo variable D2 points to $D2; \
-# echo variable D3 points to $D3; echo variable D4 points to $D4; \
-# echo variable D5 points to $D5; echo variable D6 points to $D6; \
-# echo variable D7 points to $D7; echo variable D8 points to $D8; \
-# echo variable D9 points to $D9; echo variable D10 points to $D10; \
-# \
-# echo variable D11 points to $D11; \
-# echo variable D12 points to $D12; \
-# echo variable D13 points to $D13; \
-# echo variable D14 points to $D14; \
-# echo variable D15 points to $D15; \
-# \
-# echo variable D16 points to $D16; \
-# echo variable D17 points to $D17; \
-# echo variable D18 points to $D18; \
-# echo variable D19 points to $D19; \
-# echo variable D20 points to $D20; \
-# \
-# echo CVSROOT is set to: $CVSROOT; \
-# echo CVS_RSH is set to: $CVS_RSH; \
-# echo EDITOR is set to: $EDITOR'
-
-
-
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  Banner message at end of alias 's' . . .
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-alias s='\
-echo " - - - - -";\
-\
-echo variable D1 points to $D1; echo variable D2 points to $D2; echo variable D3 points to $D3; echo variable D4 points to $D4; echo variable D5 points to $D5; echo variable D6 points to $D6; echo variable D7 points to $D7; echo variable D8 points to $D8; echo variable D9 points to $D9; echo variable D10 points to $D10;\
-\
-echo " - - - - -";\
-\
-echo variable D11 points to $D11; echo variable D12 points to $D12; echo variable D13 points to $D13; echo variable D14 points to $D14; echo variable D15 points to $D15; echo variable D16 points to $D16; echo variable D17 points to $D17; echo variable D18 points to $D18; echo variable D19 points to $D19; echo variable D20 points to $D20;\
-\
-echo " - - - - -";\
-\
-echo "variable D21 points to $D21";\
-echo "variable D22 points to $D22";\
-echo "variable D23 points to $D23";\
-echo "variable D24 points to $D24";\
-echo "variable D25 points to $D25";\
-\
-echo "variable D26 points to $D26";\
-echo "variable D27 points to $D27";\
-echo "variable D28 points to $D28";\
-echo "variable D29 points to $D29";\
-echo "variable D30 points to $D30";\
-\
-echo " - - - - -";\
-\
-# echo CVSROOT is set to: $CVSROOT; # echo CVS_RSH is set to: $CVS_RSH;\
-echo EDITOR is set to: $EDITOR;\
-echo "see file dot-bashrc-amendments.sh, typically in home directory of present user,";\
-echo "for implementation of directory bookmarks and D1..D30 variables - TMH";\
-echo "this shell script written by Ted Havelka and licensed under GNU Public License, 2005 - 2017";\
-\
-echo " - - - - -";'
-
-##------------------------------------------------------------------------------
-
-
-
-
-
-alias sp='pathlist[0]="zztop"; 
-  pathlist[1]=$D1;    pathlist[2]=$D2;    pathlist[3]=$D3;    pathlist[4]=$D4;    pathlist[5]=$D5; 
-  pathlist[6]=$D6;    pathlist[7]=$D7;    pathlist[8]=$D8;    pathlist[9]=$D9;    pathlist[10]=$D10; 
-  pathlist[11]=$D11;  pathlist[12]=$D12;  pathlist[13]=$D13;  pathlist[14]=$D14;  pathlist[15]=$D15; 
-  pathlist[16]=$D16;  pathlist[17]=$D17;  pathlist[18]=$D18;  pathlist[19]=$D19;  pathlist[20]=$D20; 
-
-  pathlist[21]=$D21;  pathlist[22]=$D22;  pathlist[23]=$D23;  pathlist[24]=$D24;  pathlist[25]=$D25; 
-  pathlist[26]=$D26;  pathlist[27]=$D27;  pathlist[28]=$D28;  pathlist[29]=$D29;  pathlist[30]=$D30; 
-
-  echo "to local file $filename saving bookmarked directories:";
-  echo -n > $filename; 
-  for index in 0 1 2 3 4 5 6 7 8 9  10 11 12 13 14 15 16 17 18 19  20 21 22 23 24 25 26 27 28 29  30; do
-      echo "saving bookmarked path $index = ${pathlist[$index]}"; 
-      echo ${pathlist[$index]} >> $filename; 
-  done '
-
-
-
-alias clear-paths='\
-export D1=""; export D2=""; export D3=""; export D4=""; export D5=""; \
-export D6=""; export D7=""; export D8=""; export D9=""; export D10=""; \
-\
-export D11=""; export D12=""; export D13=""; export D14=""; export D15=""; \
-export D16=""; export D17=""; export D18=""; export D19=""; export D20=""; \
-\
-export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
-export D26=""; export D27=""; export D28=""; export D29=""; export D30=""; \'
-
-
-
-alias load-paths=' \
-export D1=${pathlist[1]}; \
-export D2=${pathlist[2]}; \
-export D3=${pathlist[3]}; \
-export D4=${pathlist[4]}; \
-export D5=${pathlist[5]}; \
-export D6=${pathlist[6]}; \
-export D7=${pathlist[7]}; \
-export D8=${pathlist[8]}; \
-export D9=${pathlist[9]}; \
-export D10=${pathlist[10]}; \
-\
-export D11=${pathlist[11]}; \
-export D12=${pathlist[12]}; \
-export D13=${pathlist[13]}; \
-export D14=${pathlist[14]}; \
-export D15=${pathlist[15]}; \
-export D16=${pathlist[16]}; \
-export D17=${pathlist[17]}; \
-export D18=${pathlist[18]}; \
-export D19=${pathlist[19]}; \
-export D20=${pathlist[20]}; \
-\
-export D21=${pathlist[21]}; \
-export D22=${pathlist[22]}; \
-export D23=${pathlist[23]}; \
-export D24=${pathlist[24]}; \
-export D25=${pathlist[25]}; \
-export D26=${pathlist[26]}; \
-export D27=${pathlist[27]}; \
-export D28=${pathlist[28]}; \
-export D29=${pathlist[29]}; \
-export D30=${pathlist[30]}; \
-echo "Loaded user-saved paths:"; s'
-
-
-
 ##----------------------------------------------------------------------
 ##  2014-02-19 - added by Ted . . .
 ##
@@ -515,8 +750,6 @@ echo "Loaded user-saved paths:"; s'
 
 # export CROSS_COMPILE=arm-none-linux-gnueabi-
 export CROSS_COMPILE=arm-unknown-linux-gnueabi-
-
-
 
 export SESSION_MANAGER=lightdm
 
