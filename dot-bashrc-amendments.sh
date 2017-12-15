@@ -101,7 +101,7 @@ SED=/bin/sed
 
 
 SCRIPT_NAME=${0}
-echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
+# echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
 SCRIPT_NAME="dot-bash-amendments.sh"
 
 DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
@@ -109,6 +109,8 @@ DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
 FILENAME_FORM_OF_BOOKMARKED_PATHS="bookmarked-paths-nn.txt"
 
 FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
+
+BOOKMARKS_GROUPS_SUPPORTED="1..9"
 
 # . . .
 bookmarks_group=1
@@ -352,6 +354,9 @@ alias sp='pathlist[0]="zztop";
   pathlist[21]=$D21;  pathlist[22]=$D22;  pathlist[23]=$D23;  pathlist[24]=$D24;  pathlist[25]=$D25; 
   pathlist[26]=$D26;  pathlist[27]=$D27;  pathlist[28]=$D28;  pathlist[29]=$D29;  pathlist[30]=$D30; 
 
+## 2017-12-14 THU:
+  echo "about to save bookmarked paths using old script code in alias," 
+  echo "in this code \$filename holds '$filename'," 
   echo "to local file $filename saving bookmarked directories:";
   echo -n > $filename; 
   for index in 0  1 2 3 4 5 6 7 8 9 10  11 12 13 14 15 16 17 18 19 20  21 22 23 24 25 26 27 28 29 30; do
@@ -430,9 +435,9 @@ echo "Loaded user-saved paths:"; s'
 
 function read_bookmarks_runtime_config()
 {
-    echo "READ_BOOKMARKS_RUNTIME_CONFIG NOT YET IMPLEMENTED"
+    echo "* * * Script function read_bookmarks_runtime_config() implementation underway * * *"
 
-    filename=${HOME}/${}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
+    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
 
     if [ -e ${filename} ]; then
         # read bookmarked paths runtime config file . . .
@@ -453,6 +458,40 @@ function read_bookmarks_runtime_config()
 
 
 
+function write_bookmarks_runtime_config()
+{
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+##  2017-12-14 - Script contributor Ted noting that this function to
+##   write the bookmarks run-time config file is nearly identical to
+##   the function to read this same file.  Wondering if there's an
+##   elegant way to combine the two functions?  - TMH
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    echo "* * * Script function write_bookmarks_runtime_config() implementation underway * * *"
+    echo "called with bookmarks group identifier '${1}',"
+
+    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
+
+    if [ -e ${filename} ]; then
+        # write one value bookmarked paths runtime config file, overwriting all data in this file:
+        echo "${SCRIPT_NAME}:  writing directory bookmarks runtime configuration file . . ."
+        echo ${1} > ${filename}
+    else
+        touch ${filename}
+        if [ -e ${filename} ]; then
+            echo ${1} > ${filename}
+        else
+            echo "${SCRIPT_NAME}:  - WARNING - unable to open and unable to create runtime config file!"
+            echo "${SCRIPT_NAME}:  - will start with bookmarks group set to 1,"
+            echo "${SCRIPT_NAME}:  - presently bookmarks groups 1 through 9 supported."
+        fi
+    fi
+}
+
+
+
+
+
 function read_bookmarks_file()
 {
 
@@ -460,7 +499,18 @@ function read_bookmarks_file()
     echo "first two arguments from caller are '$1' and '$2',"
 #    echo "variable \${SED} holds '${SED}',"
 
-    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${2}/)
+    BOOKMARKED_PATHS_GROUP=${2}
+
+    if [[ ${BOOKMARKED_PATHS_GROUP} =~ [1-5] ]] ; then
+        echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
+    else
+        echo "- NOTE - caller requests unsupported or unknown bookmarks file identified by '${2}',"
+        echo "- NOTE - defaulting to read bookmarked directories in bookmarks group 1,"
+        BOOKMARKED_PATHS_GROUP=1
+    fi
+
+##    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${2}/)
+    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${BOOKMARKED_PATHS_GROUP}/)
 
     echo "will read bookmarks from file named ${bookmarks_filename},"
 
@@ -514,14 +564,16 @@ else
 fi
 
 
-    echo ""
-    echo "- DIAG START -"
-    echo "after reading bookmarks file,"
-    echo "\${pathlist[1]} holds '${pathlist[1]}'"
-    echo "\${pathlist[2]} holds '${pathlist[2]}'"
-    echo "\${pathlist[3]} holds '${pathlist[3]}'"
-    echo "- DIAG END -"
-    echo ""
+    if [ ]; then
+        echo ""
+        echo "- DIAG START -"
+        echo "after reading bookmarks file,"
+        echo "\${pathlist[1]} holds '${pathlist[1]}'"
+        echo "\${pathlist[2]} holds '${pathlist[2]}'"
+        echo "\${pathlist[3]} holds '${pathlist[3]}'"
+        echo "- DIAG END -"
+        echo ""
+    fi
 
 
 # 2006-11-27
@@ -572,17 +624,38 @@ fi
     export D30=${pathlist[30]}
 
 
-    echo ""
-    echo "- DIAG START -"
-    echo "after exporting \$D1..\$D30,"
-    echo "\$D1 holds '$D1',"
-    echo "\$D2 holds '$D2',"
-    echo "\$D3 holds '$D3',"
-    echo "- DIAG END -"
-    echo ""
+    if [ ]; then
+        echo ""
+        echo "- DIAG START -"
+        echo "after exporting \$D1..\$D30,"
+        echo "\$D1 holds '$D1',"
+        echo "\$D2 holds '$D2',"
+        echo "\$D3 holds '$D3',"
+        echo "- DIAG END -"
+        echo ""
+    fi
 
 
 } # end function read_bookmarks_file()
+
+
+
+
+function clear_paths_function()
+{
+
+#    echo "clear_paths_function:  clearing bookmarked paths in current shell, setting \$D1..\$D30 to '',"
+
+    export D1=""; export D2=""; export D3=""; export D4=""; export D5="";
+    export D6=""; export D7=""; export D8=""; export D9=""; export D10="";
+
+    export D11=""; export D12=""; export D13=""; export D14=""; export D15="";
+    export D16=""; export D17=""; export D18=""; export D19=""; export D20="";
+
+    export D21=""; export D22=""; export D23=""; export D24=""; export D25="";
+    export D26=""; export D27=""; export D28=""; export D29=""; export D30="";
+
+}
 
 
 
@@ -615,16 +688,17 @@ fi
 
 bookmarks_dir=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}
 
-echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
+# echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
 ## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when 
 ## +  the argument to the file test is a zero-length string?  Or undefined variable?
 ## +  Does Mendel Cooper's guide explain this behavior?  There was a type 
 ## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
 
 if [ -e ${bookmarks_dir} ]; then
-    echo "found directory '${booksmarks_dir}' for bookmarked path files, not creating this directory."
+#    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
+    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory." > /dev/null
 else
-    echo "creating directory ${bookmarks_dir} . . ."
+#    echo "creating directory ${bookmarks_dir} . . ."
     mkdir -pv ${bookmarks_dir}
 fi
 
@@ -648,10 +722,9 @@ fi
 ##  STEP - read file holding bookmarked paths
 ##----------------------------------------------------------------------
 
-    echo "- DIAG BEGIN - calling alias 'clearpaths' to clear bookmarks:"
-#    clear-paths
-    clearpaths
-    echo "- DIAG END - \$D1 holds '$D1'"
+#    echo "- DIAG BEGIN - calling function (not alias) to clear any directory bookmarks . . ."
+    clear_paths_function
+#    echo "- DIAG END - \$D1 holds '$D1'"
 
 # if [[ "$#" -eq "1" ]]; then
 if [ "$#" -gt 0 ]; then
@@ -660,10 +733,41 @@ else
     bookmarks_group=1
 fi
 
+
+
+
+##----------------------------------------------------------------------
+##  STEP - check for valid bookmarks group identifier, should be
+##  an integer value between 1 and 9 for now, 2017 December:
+##----------------------------------------------------------------------
+
+bookmarked_paths_group_in_script_main_line=${1}
+
+if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
+    echo "script called with bookmarks group number ${bookmarked_paths_group_in_script_main_line}, in range ${BOOKMARKS_GROUPS_SUPPORTED}"
+    echo "which we support as of 2017 December."
+    write_bookmarks_runtime_config ${bookmarked_paths_group_in_script_main_line}
+else
+    echo "script called with unsupported bookmarks group id, id we got is '${bookmarked_paths_group_in_script_main_line}',"
+    echo "setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
+    bookmarked_paths_group_in_script_main_line=1
+
+## ALTERNATELY HERE:  we could read bookmarks run-time configuration file to obtain latest chosen bookmarks group.
+fi
+
+
+echo "calling bash amendments function to read run-time config file . . ."
+read_bookmarks_runtime_config
+
 echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group}' . . ."
 read_bookmarks_file $0 ${bookmarks_group}
 
 
+
+
+## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1:
+
+if [ ]; then
     echo ""
     echo "- DIAG START in main-line code of script -"
     echo "back from call to read_bookmarks_file() which exports \$D1..\$D30,"
@@ -672,16 +776,8 @@ read_bookmarks_file $0 ${bookmarks_group}
     echo "\$D3 holds '$D3',"
     echo "- DIAG END in main-line code of script -"
     echo ""
+fi
 
-
-
-##----------------------------------------------------------------------
-##  STEP:  set shell aliases . . . moved to two functions of this script
-##----------------------------------------------------------------------
-
-#    set_aliases
-
-#    set_aliases_for_bookmarking
 
 
 
@@ -719,6 +815,10 @@ read_bookmarks_file $0 ${bookmarks_group}
 # 2014-01-24 . . .
 
     PATH="${PATH}":/var/opt/sam-ba_cdc_cdc_linux
+
+# 2017-12-04 . . .
+
+    PATH="${PATH}":~/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
 
 
 
@@ -758,6 +858,11 @@ read_bookmarks_file $0 ${bookmarks_group}
 export CROSS_COMPILE=arm-unknown-linux-gnueabi-
 
 export SESSION_MANAGER=lightdm
+
+
+
+echo "done."
+
 
 
 # EOF ( end of file )
