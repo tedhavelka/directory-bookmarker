@@ -6,7 +6,7 @@
 ##  FILE:  .bashrc-amendments, also named dot-bashrc-amendments.sh
 ##
 ##
-##  LAST TOUCHED:  2017-02-10 FRI
+##  LAST TOUCHED:  2017-12-14 THU
 ##
 ##
 ##  DESCRIPTION:  short script to amend Debian and Ubuntu and or
@@ -333,7 +333,9 @@ function set_aliases_for_bookmarking()
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 alias s='\
-echo " - - - - -";\
+echo
+echo "Bookmarked paths in bookmarks group ${bookmarks_group_id} are:"
+echo
 \
 echo "variable D1 points to $D1";\
  echo variable D2 points to $D2; echo variable D3 points to $D3; echo variable D4 points to $D4; echo variable D5 points to $D5; echo variable D6 points to $D6; echo variable D7 points to $D7; echo variable D8 points to $D8; echo variable D9 points to $D9; echo variable D10 points to $D10;\
@@ -356,15 +358,13 @@ echo "variable D28 points to $D28";\
 echo "variable D29 points to $D29";\
 echo "variable D30 points to $D30";\
 \
-echo " - - - - -";\
-\
-# echo CVSROOT is set to: $CVSROOT; # echo CVS_RSH is set to: $CVS_RSH;\
+echo; \
 echo EDITOR is set to: $EDITOR;\
 echo "see file dot-bashrc-amendments.sh, typically in home directory of present user,";\
 echo "for implementation of directory bookmarks and D1..D30 variables - TMH";\
 echo "this shell script written by Ted Havelka and licensed under GNU Public License, 2005 - 2017";\
 \
-echo " - - - - -";'
+echo'
 
 ##------------------------------------------------------------------------------
 
