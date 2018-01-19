@@ -6,7 +6,7 @@
 ##  FILE:  .bashrc-amendments, also named dot-bashrc-amendments.sh
 ##
 ##
-##  LAST TOUCHED:  2017-12-14 THU
+##  LAST TOUCHED:  2018-01-19 FRI
 ##
 ##
 ##  DESCRIPTION:  short script to amend Debian and Ubuntu and or
@@ -71,9 +71,19 @@
 ##         holds and status of whether each given bookmark exists
 ##         as a valid path on the local file system,
 ##
-##    [ ]  2017-12-02 - add parameters sanity check to routine 'read_bookmarks_file',
+##    [ ]  2017-12-02 - add sanity check of parameters to routine 'read_bookmarks_file',
 ##
-##    [ ]  2017-12-02 - add settings file to store latest selected group of bookmarks,
+##    [x]  2017-12-02 - add settings file to store latest selected group of bookmarks,
+##
+##
+##  - 2018-01-19 -
+##
+##    [ ]  add function to read run-time config parameters and build
+##         hashi-equivalent of these in the given script instance,
+##
+##    [ ]  add a directory book marker "show_diag" function to
+##         more easily support range of message level verbosity,
+##
 ##
 ##
 ##
@@ -103,6 +113,12 @@
 ##    *  https://www.cyberciti.biz/faq/unix-howto-read-line-by-line-from-file/
 ##
 ##    *  http://www.linuxjournal.com/content/return-values-bash-functions
+##
+##
+##
+##  WHERE TO FIND THIS PROJECT ON-LINE:
+##
+##    *  https://github.com/tedhavelka/directory-bookmarker
 ##
 ##
 ##
@@ -138,21 +154,65 @@ FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
 
 BOOKMARKS_GROUPS_SUPPORTED="1..9"
 
-# Directory Book Marker watermark, for sane $PATH amendments:
+# directory book-marker watermark, to limit $PATH amendments to one
+# amendment per shell login or shell session:
 DBM_WATERMARK="${HOME}/path-amended-by-directory-bookmarker"
 
-# . . .
+
+
+# As of 2018-01-19 bookmarked directories are stored as groups in text
+# files and identified by whole numbers ranging from 1 to 9.  Here set
+# a script-wide default bookmarks group identifier.  May be changed
+# when directory book-marker script reads its run-time config file:
 bookmarks_group_id=1
 
 # Shell variable used in 'sp' alias to save bookmarked paths:
 index=0
 
+SCRIPT_MESSAGE_LEVEL__SILENT=0
+SCRIPT_MESSAGE_LEVEL__ERRORS=1
+SCRIPT_MESSAGE_LEVEL__ERRORS_WARNINGS=2
+SCRIPT_MESSAGE_LEVEL__ERRORS_WARNINGS_INFO=4
 
+# Script messages verbosity level:
+DBM_MESSAGE_VERBOSITY=$SCRIPT_MESSAGE_LEVEL__ERRORS_WARNINGS_INFO
+DBM_MESSAGE_VERBOSITY=$SCRIPT_MESSAGE_LEVEL__SILENT
+
+
+
+##
 ## 2017-12-02 - How are these variables used? - TMH
+##
 bash_settings_file="${HOME}/.bash_settings_local"
 
 
 # SCRIPT VARS END
+
+
+
+
+##----------------------------------------------------------------------
+##  SECTION - diagnostics functions
+##----------------------------------------------------------------------
+
+function show_diag()
+{
+    if [[ "$DBM_MESSAGE_VERBOSITY" != "$SCRIPT_MESSAGE_LEVEL__SILENT" ]]; then
+        if [ -z "$1" ]; then
+            echo "- dbm - no message received in show_diag() from calling part of this script!"
+        else
+            echo "$1"
+        fi
+#    else
+#        echo "- dbm - diagnostics and other messages silenced."
+    fi
+}
+
+
+function show_script_message_verbosity()
+{
+    echo "- dbm - directory book-marker script message level set to $DBM_MESSAGE_VERBOSITY,"
+}
 
 
 
@@ -607,7 +667,7 @@ function read_bookmarks_file()
 REGEX="[1-9]"
 #    if [[ ${bookmarked_paths_group} =~ [1-5] ]] ; then
     if [[ ${bookmarked_paths_group} =~ ${REGEX} ]] ; then
-        echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
+        show_diag "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
     else
         echo "- NOTE - caller requests unsupported or unknown bookmarks file identified by '${2}',"
         echo "- NOTE - defaulting to read bookmarked directories in bookmarks group 1,"
@@ -617,7 +677,7 @@ REGEX="[1-9]"
 ##    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${2}/)
     bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${bookmarked_paths_group}/)
 
-    echo "will read bookmarks from file named ${bookmarks_filename},"
+    show_diag "will read bookmarks from file named ${bookmarks_filename},"
 
 ## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ##  NOTE - had trouble getting these export statements to fly . . .
@@ -839,8 +899,6 @@ echo "starting,"
 ## Following test succeeds:
 if [[ "$#" -eq "1" ]]; then
     echo "called with first argument set to '$1',"
-#    echo "calling 'read directory bookmarks file' with no arguments . . ."
-#    read_bookmarks_file
 fi
 
 
@@ -858,10 +916,9 @@ bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
 ## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
 
 if [ -e ${bookmarks_dir} ]; then
-#    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
-    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory." > /dev/null
+    show_diag "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
 else
-#    echo "creating directory ${bookmarks_dir} . . ."
+    show_diag "creating directory ${bookmarks_dir} . . ."
     mkdir -pv ${bookmarks_dir}
 fi
 
@@ -918,14 +975,15 @@ else
 #        echo "setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
 #        bookmarked_paths_group_in_script_main_line=1
 
-        echo "script called without bookmarked paths group specified,"
-        echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
+        show_diag "script called without bookmarked paths group specified,"
+        show_diag "looking for last-used bookmarks group in dot-bash-amendments run-time config file,"
         bookmarks_group_id=$(read_bookmarks_runtime_config)
-        echo "- DEV - from rc file read bookmarks group id '${bookmarks_group_id}',"
+        show_diag "from rc file just read bookmarks group id '${bookmarks_group_id}',"
+#        show_diag "$lbuf"
     else
-        echo "- NOTE - script called with unsupported bookmarks group id,"
-        echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
-        echo "- NOTE - setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
+        show_diag "- NOTE - script called with unsupported bookmarks group id,"
+        show_diag "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
+        show_diag "- NOTE - setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
         bookmarked_paths_group_in_script_main_line=1
     fi
 fi
@@ -934,7 +992,7 @@ fi
 # echo "calling bash amendments function to read run-time config file . . ."
 # read_bookmarks_runtime_config
 
-echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
+show_diag "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
 read_bookmarks_file $0 ${bookmarks_group_id}
 
 
@@ -976,7 +1034,7 @@ fi
 # Amending the default path variable:
 
     if [ "$1" == "restore-path-variable" ]; then 
-echo "- dbm - RESTORING PATH VARIABLE . . ."
+        echo "- dbm - RESTORING PATH VARIABLE . . ."
         restore_path_variable_to_as_found
     else
         amend_path_variable
