@@ -138,6 +138,9 @@ FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
 
 BOOKMARKS_GROUPS_SUPPORTED="1..9"
 
+# Directory Book Marker watermark, for sane $PATH amendments:
+DBM_WATERMARK="${HOME}/path-amended-by-directory-bookmarker"
+
 # . . .
 bookmarks_group_id=1
 
@@ -219,6 +222,8 @@ function set_aliases()
 
     alias xlock='/usr/bin/xlock -mode scooter -count 100'
 
+
+    alias restore-path-var='. ${HOME}/dot-bashrc-amendments.sh restore-path-variable'
 
 
 } # end function set_aliases()
@@ -760,6 +765,64 @@ function clear_paths_function()
 
 
 
+function amend_path_variable()
+{
+##----------------------------------------------------------------------
+##  PURPOSE:  amend user's $PATH environment variable
+##
+##  NEED:  to add logic so that for a given shell session, when this
+##   script called a second or successive time it does not amend the
+##   $PATH variable with duplicate paths.  Need a test . . .   - TMH
+##
+##----------------------------------------------------------------------
+
+    string=`echo $PATH | grep $DBM_WATERMARK`
+
+    if [ -z "$string" ]
+    then
+        path_as_found=${PATH}
+
+# Amending the default path variable:
+
+#        PATH="/usr/bin:${PATH}"
+#        PATH="${PATH}":/sbin
+#        PATH="${PATH}":/usr/sbin
+        PATH="${PATH}":/opt/bin
+        PATH="${PATH}":/opt/cross/bin
+        PATH="${PATH}":/opt/cross/x-tools/arm-unknown-linux-gnueabi/bin
+#        PATH="${PATH}":.
+        PATH="${PATH}":${HOME}/bin
+        PATH="${PATH}":/usr/local/mysql/bin
+        PATH="${PATH}":/usr/lib/xscreensaver
+        PATH="${PATH}":/etc/init.d
+
+# 2014-01-24 . . .
+        PATH="${PATH}":/var/opt/sam-ba_cdc_cdc_linux
+
+# 2017-12-04 . . .
+        PATH="${PATH}":~/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
+
+# 2018-01-19 - add a pattern to the path to avoid multple path variable
+#  amendments per shell session:
+        PATH="${PATH}:$DBM_WATERMARK"
+
+    else
+        echo "\$PATH variable already amended, directory book-marker leaving untouched."
+    fi
+
+}
+
+
+
+function restore_path_variable_to_as_found()
+{
+    PATH=$path_as_found
+}
+
+
+
+
+
 ##----------------------------------------------------------------------
 ##
 ##  SECTION - main-line code of dot-bash-amendments.sh
@@ -826,13 +889,16 @@ fi
     clear_paths_function
 #    echo "- DIAG END - \$D1 holds '$D1'"
 
-#     if [[ "$#" -eq "1" ]]; then
-    if [ "$#" -gt 0 ]; then
-        bookmarks_group_id=${1}
-    else
-        bookmarks_group_id=1
-    fi
+##  *  https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
 
+     re='^[0-9]+$'
+     if [[ $1 =~ $re ]]; then
+        if [ "$#" -gt 0 ]; then
+            bookmarks_group_id=${1}
+        else
+            bookmarks_group_id=1
+        fi
+     fi
 
 
 
@@ -899,7 +965,6 @@ fi
 ##  NOTE - path environment variable amendments, mostly for
 ##   work on Debian and Ubuntu Linux based systems
 ##
-##
 ##  NOTE - when $PATH variable includes present working directory, e.g.
 ##   "." then buildroot 2.x complains and bails during project
 ##   compilation.  For smooth buildroot project builds, keep the 
@@ -910,25 +975,12 @@ fi
 
 # Amending the default path variable:
 
-#    PATH="/usr/bin:${PATH}"
-    PATH="${PATH}":/sbin
-    PATH="${PATH}":/usr/sbin
-    PATH="${PATH}":/opt/cross/bin
-    PATH="${PATH}":/opt/cross/x-tools/arm-unknown-linux-gnueabi/bin
-#    PATH="${PATH}":.
-    PATH="${PATH}":${HOME}/bin
-    PATH="${PATH}":/usr/local/mysql/bin
-    PATH="${PATH}":/usr/lib/xscreensaver
-    PATH="${PATH}":/etc/init.d
-
-# 2014-01-24 . . .
-
-    PATH="${PATH}":/var/opt/sam-ba_cdc_cdc_linux
-
-# 2017-12-04 . . .
-
-    PATH="${PATH}":~/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
-
+    if [ "$1" == "restore-path-variable" ]; then 
+echo "- dbm - RESTORING PATH VARIABLE . . ."
+        restore_path_variable_to_as_found
+    else
+        amend_path_variable
+    fi
 
 
 # Concurrent Versions System (CVS) variables:
