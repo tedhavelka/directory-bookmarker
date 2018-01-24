@@ -25,7 +25,7 @@
 ##
 ##    $ . dot-bashrc-amendments.sh
 ##
-##    or alternately for convenience a given user may amond their
+##    or alternately for convenience a given user may amend their
 ##    .login or .bashrc start-up script to include a line which
 ##    does the same sourcing of this file.
 ##
@@ -624,6 +624,16 @@ function read_bookmarks_runtime_config()
 function write_bookmarks_runtime_config()
 {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+##
+##  2018-01-19 - Note this routine overwrites the directory
+##   book-marking script's run time config file, with a single number
+##   representing the current directory bookmarks group.  Other lines
+##   added to or changes made to the run time config file will be lost,
+##   until this function is improved to selectively modify the file --
+##   perhaps using `sed` -- in place of overwriting it.  - TMH
+##
+##
+##
 ##  2017-12-14 - Script contributor Ted noting that this function to
 ##   write the bookmarks run-time config file is nearly identical to
 ##   the function to read this same file.  Wondering if there's an
@@ -998,7 +1008,9 @@ read_bookmarks_file $0 ${bookmarks_group_id}
 
 
 
-## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1:
+## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1
+##  "What is truth?" in the shell context.  Show how to express a value
+##  which bash treats as false:
 
 if [ ]; then
     echo ""
@@ -1010,7 +1022,6 @@ if [ ]; then
     echo "- DIAG END in main-line code of script -"
     echo ""
 fi
-
 
 
 
