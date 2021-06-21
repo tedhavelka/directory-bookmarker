@@ -1,20 +1,28 @@
-# --- START README.md for directory-bookmarker project ---
+------------------------------------------------------------------------
+             Open Source Shell Based Directory Bookmarker
+------------------------------------------------------------------------
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  Open source directory bookmarker by Ted Havelka
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# OVERVIEW:
+Command line, directory bookmarking facility written in Bourne Again shell.  Really a path bookmarking facility.  Useful for work situations where multiple directories need be accessed and visited often from the command line.
 
 
-Supported Environments:
-
+# WHERE SUPPORTED:
  Works in Unix and Linux shell environments, typically installed in
  given user's home directory.  Won't automatically run by its presence
  alone, but easy to activate automatically at login by sourcing this
  script from a standard shell login script such as .bashrc.
 
 
+# INSTALL AND ENABLING:
+Typical installation steps include,
+(1)  copy the main script 'dot-bashrc-amendments.sh' to given user's home directory.
+(2)  amend .bashrc and or .bash_login script to include stanzas which test for and source this main script.
 
-Basic use:
+Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.
+
+
+# BASIC USE:
+Using a Unis or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
 
 *  's'           to show bookmarked full paths to directories,
 *  'sd1'         to set bookmark 1 of 30 or so,
@@ -27,7 +35,7 @@ Basic use:
 *  'clearpaths'  alias to clear bookmarked paths in present shell session / environment
 
 
-
+# TO-DO
 Features underway or to be added:
 
 - 2017-12-02 SAT -
@@ -50,5 +58,10 @@ Bookmarker contributor Ted noting there is much clean-up work to do in this shel
 [ ]  add optional bookmarks group names, at present they're just numbered 1..9
 
 
+# RERFERENCES:
 
-# --- END README.md for directory-bookmarker project ---
+Following article describes different behaviors of .bashrc and .bash_profile start up scripts:
+*  https://dev.to/awwsmm/setting-up-an-ubuntu-vm-on-windows-server-2g23
+     
+     
+--- END README.md for directory-bookmarker project ---
