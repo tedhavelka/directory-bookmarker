@@ -7,17 +7,19 @@ Command line, directory bookmarking facility written in Bourne Again shell.  Rea
 
 
 ## WHERE SUPPORTED:
- Works in Unix and Linux shell environments, typically installed in
- given user's home directory.  Won't automatically run by its presence
- alone, but easy to activate automatically at login by sourcing this
- script from a standard shell login script such as .bashrc.
+Works in Unix and Linux shell environments, including Gitbash on Windows hosts.  Typically installed in given user's home directory.  Won't automatically run by its presence alone, but easy to activate automatically at login by sourcing this script from a standard shell login script such as .bashrc.
 
 
 ## INSTALL AND ENABLING:
 Typical installation steps include,
 (1)  copy the main script 'dot-bashrc-amendments.sh' to given user's home directory.
 (2)  amend .bashrc and or .bash_login script to include stanzas which test for and source this main script.
-
+An example of stanzas or lines added to source this script is,
+'''
+if [ -f dot-bashrc-amendments.sh ]; then
+  . dot-bashrc-amendments.sh
+fi
+'''
 Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.
 
 
@@ -63,6 +65,9 @@ For all things shell scripting:
 *  https://tldp.org/LDP/abs/html/index.html
 Following article describes different behaviors of .bashrc and .bash_profile start up scripts:
 *  https://dev.to/awwsmm/setting-up-an-ubuntu-vm-on-windows-server-2g23
+Some mark down references:
+*  https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf
+*  https://towardsdatascience.com/the-ultimate-markdown-cheat-sheet-3d3976b31a0
      
      
 --- END README.md for directory-bookmarker project ---
