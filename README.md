@@ -12,15 +12,15 @@ Works in Unix and Linux shell environments, including Gitbash on Windows hosts. 
 
 ## INSTALL AND ENABLING:
 Typical installation steps include,
-(1)  copy the main script 'dot-bashrc-amendments.sh' to given user's home directory.
-(2)  amend .bashrc and or .bash_login script to include stanzas which test for and source this main script.
-An example of stanzas or lines added to source this script is,
-'''
-if [ -f dot-bashrc-amendments.sh ]; then
+1.  copy the main script 'dot-bashrc-amendments.sh' to given user's home directory.
+2.  amend .bashrc and or .bash_login script to include stanzas which test for and source this main script.
+An example of stanzas or lines added to source this script is:
+
+'''if [ -f dot-bashrc-amendments.sh ]; then
   . dot-bashrc-amendments.sh
-fi
-'''
-Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.
+fi'''
+
+Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.  The main script itself can also be renamed.  In that case, again the .bashrc or .bash_profile lines to source directory bookmarker main script will need to be amended with the alternate name of this script.
 
 
 ## BASIC USE:
