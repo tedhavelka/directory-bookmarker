@@ -17,9 +17,10 @@ Typical installation steps include,
 An example of stanzas or lines added to source this script is:
 
 <samp>
-if [ -f dot-bashrc-amendments.sh ]; then
-  . dot-bashrc-amendments.sh
-fi</samp>
+> if [ -f dot-bashrc-amendments.sh ]; then
+>     . dot-bashrc-amendments.sh
+> fi
+</samp>
 
 Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.  The main script itself can also be renamed.  In that case, again the .bashrc or .bash_profile lines to source directory bookmarker main script will need to be amended with the alternate name of this script.
 
