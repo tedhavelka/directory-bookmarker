@@ -1,20 +1,17 @@
-# --- START README.md for directory-bookmarker project ---
+------------------------------------------------------------------------
+             Open Source Shell Based Directory Bookmarker
+------------------------------------------------------------------------
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  Open source directory bookmarker by Ted Havelka
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# OVERVIEW:
 
-
-Supported Environments:
-
+# WHERE SUPPORTED:
  Works in Unix and Linux shell environments, typically installed in
  given user's home directory.  Won't automatically run by its presence
  alone, but easy to activate automatically at login by sourcing this
  script from a standard shell login script such as .bashrc.
 
-
-
-Basic use:
+# BASIC USE:
+Using a Unis or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
 
 *  's'           to show bookmarked full paths to directories,
 *  'sd1'         to set bookmark 1 of 30 or so,
@@ -27,7 +24,7 @@ Basic use:
 *  'clearpaths'  alias to clear bookmarked paths in present shell session / environment
 
 
-
+# TO-DO
 Features underway or to be added:
 
 - 2017-12-02 SAT -
@@ -49,6 +46,13 @@ Bookmarker contributor Ted noting there is much clean-up work to do in this shel
 
 [ ]  add optional bookmarks group names, at present they're just numbered 1..9
 
+
+# RERFERENCES:
+
+Following article describes different behaviors of .bashrc and .bash_profile start up scripts:
+*  https://dev.to/awwsmm/setting-up-an-ubuntu-vm-on-windows-server-2g23
+     
+     
 
 
 # --- END README.md for directory-bookmarker project ---
