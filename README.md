@@ -75,10 +75,10 @@ Bookmarker contributor Ted noting there is much clean-up work to do in this shel
 
 A summary comment on directory bookmarker "to do" tasks, there are as of 2021 August four areas of script action which contributor Ted looking to factor into separate shell scripts.  These script actions include:
 
- (1)  script help contents and display routine
- (2)  command aliases, e.g. "alias rm='rm -i'"
- (3)  $PATH amendments to separate file
- (4)  custom environment variable declarations and assignments
+1.  script help contents and display routine
+2.  command aliases, e.g. "alias rm='rm -i'"
+3.  $PATH amendments to separate file
+4.  custom environment variable declarations and assignments
 
 In particular tasks or functions 3 and 4 are most particular to given end users, and are not related to the convenience of storing (bookmarking) often visited paths.  Directory bookmarker is not huge, but it has grown over some years and is harder to maintain in a clean, concise fashion.  Such a factoring of environmental configuration tasks could make the bookmarker project easier to use and develop.
 
