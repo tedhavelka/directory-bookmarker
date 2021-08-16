@@ -16,13 +16,14 @@ Typical installation steps include,
 2.  amend .bashrc and or .bash_login script to include stanzas which test for and source this main script.
 An example of stanzas or lines added to source this script is:
 
+<i>Code snippet 1 - script to source directory bookmarker:</i>
 <pre>
 if [ -f dot-bashrc-amendments.sh ]; then
     . dot-bashrc-amendments.sh
 fi
 </pre>
 
-Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  If this is done then the path alternate path will need to be expressed in the added stanzas in .bashrc and or .bash_login.  The main script itself can also be renamed.  In that case, again the .bashrc or .bash_profile lines to source directory bookmarker main script will need to be amended with the alternate name of this script.
+Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  When directory bookmarker script is installed in a path other than path of .bashrc or .bash_login, the above sourcing lines need be amended to spell out that path.  The bookmarking script can also be renamed.  In that case, again the .bashrc or .bash_profile lines to source directory bookmarker need to be amended with the alternate name of this script.
 
 
 ## BASIC USE:
@@ -47,7 +48,8 @@ Features underway or to be added:
 Bookmarker contributor Ted noting there is much clean-up work to do in this shell script.  Ted working to:
 
 [ ]  factor command aliasing, path variable amendments into shell routines
-   [x]  command aliasing is factored into a couple of shell routines
+
+[x]  command aliasing is factored into a couple of shell routines
 
 [x]  add support for multiple directory bookmark sets
 
@@ -60,6 +62,25 @@ Bookmarker contributor Ted noting there is much clean-up work to do in this shel
 [ ]  add summary report of number of bookmark groups defined, their names, first few entries
 
 [ ]  add optional bookmarks group names, at present they're just numbered 1..9
+
+
+- 2021-08-14 MON -
+
+[ ]  script review and clean up, line by line
+
+[ ]  factor to separate file amendments to $PATH env variable
+
+[ ]  factor to separate file declarations and assignments to custom env variables
+
+
+A summary comment on directory bookmarker "to do" tasks, there are as of 2021 August four areas of script action which contributor Ted looking to factor into separate shell scripts.  These script actions include:
+
+(1)  script help contents and display routine
+(2)  command aliases, e.g. "alias rm='rm -i'"
+(3)  $PATH amendments to separate file
+(4)  custom environment variable declarations and assignments
+
+In particular tasks or functions 3 and 4 are most particular to given end users, and are not related to the convenience of storing (bookmarking) often visited paths.  Directory bookmarker is not huge, but it has grown over some years and is harder to maintain in a clean, concise fashion.  Such a factoring of environmental configuration tasks could make the bookmarker project easier to use and develop.
 
 
 ## RERFERENCES:
