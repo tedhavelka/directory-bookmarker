@@ -42,7 +42,7 @@ Notes:
 
 
 ## TO-DO
-This section mentions bookmarker features underway or to be added.  Contributor Ted noting there is much clean-up work to do in this shell script.  Present outstanding improvements sorted roughly by date of posting includehttps://github.com/tedhavelka/kionix-driver-demo:
+This section mentions bookmarker features underway or to be added.  Contributor Ted noting there is much clean-up work to do in this shell script.  Present outstanding improvements sorted roughly by date of posting include:
 
 - 2017-12-14 THU -
 
