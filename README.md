@@ -30,14 +30,15 @@ Note that the main script can also be installed in some alternate directory, suc
 Using a Unis or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
 
 *  's'           to show bookmarked full paths to directories,
-*  'sd1'         to set bookmark 1 of 30 or so,
-*  'sdn'         to set bookmark n of 30 or so, where n is a positive integer
-*  'gd1'         to change working directory to first bookmarked path
-*  'gdn'         to change working directory to first bookmarked path
+*  'sdn'         to set bookmark n of 30, where n is a positive integer in the set 1..30
+*  'gdn'         to change working directory to bookmarked path n of 30 path in the present group of paths
 *  'sp'          to save bookmarked paths in present shell to text file
 
 *  'lp1'         to load paths (bookmarked paths) group 1 out of groups 1..9
-*  'clearpaths'  alias to clear bookmarked paths in present shell session / environment
+*  'clearpaths'  alias to clear bookmarked paths in present shell session / environment (1)
+
+Notes:
+(1)  bookmarker script alias `clearpaths` does not alter a user's present ${PATH} environment variable.  This alias only sets all the bookmarker variables to the null string "".
 
 
 ## TO-DO
@@ -47,21 +48,14 @@ Features underway or to be added:
 
 Bookmarker contributor Ted noting there is much clean-up work to do in this shell script.  Ted working to:
 
-[ ]  factor command aliasing, path variable amendments into shell routines
-
-[x]  command aliasing is factored into a couple of shell routines
-
-[x]  add support for multiple directory bookmark sets
-
-
 - 2017-12-14 THU -
 
 [ ]  write a separate use and help file for the directory bookmarking script,
      and add alias to show this use file
 
-[ ]  add summary report of number of bookmark groups defined, their names, first few entries
-
 [ ]  add optional bookmarks group names, at present they're just numbered 1..9
+
+[ ]  add summary report of number of bookmark groups defined, their names, first few entries
 
 
 - 2021-08-14 MON -
@@ -73,11 +67,16 @@ Bookmarker contributor Ted noting there is much clean-up work to do in this shel
 [ ]  factor to separate file declarations and assignments to custom env variables
 
 
+- 2021-09-24 FRI -
+
+[ ]  add support for paths which contain white space
+
+
 A summary comment on directory bookmarker "to do" tasks, there are as of 2021 August four areas of script action which contributor Ted looking to factor into separate shell scripts.  These script actions include:
 
 1.  script help contents and display routine
 2.  command aliases, e.g. "alias rm='rm -i'"
-3.  $PATH amendments to separate file
+3.  given user's ${PATH} amendments
 4.  custom environment variable declarations and assignments
 
 In particular tasks or functions 3 and 4 are most particular to given end users, and are not related to the convenience of storing (bookmarking) often visited paths.  Directory bookmarker is not huge, but it has grown over some years and is harder to maintain in a clean, concise fashion.  Such a factoring of environmental configuration tasks could make the bookmarker project easier to use and develop.
