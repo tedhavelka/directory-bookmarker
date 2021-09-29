@@ -14,6 +14,7 @@ function set_aliases()
     if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then  ## <-- integer comparison here
         echo "setting some shell safety and shortcut aliases . . ."
     fi
+echo "setting some shell safety and shortcut aliases . . ."
 
 ## Some important shell safe-guarding aliases for Unix and Linux systems:
     alias rm='rm -i'
@@ -47,6 +48,8 @@ function set_aliases()
 #    alias xlock='/usr/bin/xlock -mode scooter -count 100'
 
     alias df='df -h | grep sd; echo "( note \"df\" command aliased to \"df -h | grep sd\" )"'
+
+    return "test-helper-script-return-value"
 
 } # end function set_aliases()
 

@@ -155,10 +155,22 @@ index=0
 bash_settings_file="${HOME}/.bash_settings_local"
 
 
+##----------------------------------------------------------------------
+## Shell environment settings beyond directory bookmarking,
+##  ( Set these variables to '1' to enable given environment
+##    amendments. )
+##----------------------------------------------------------------------
+
 DBM_ENABLE_STANDARD_COMMAND_ALIASES=1
+DBM_ENABLE_CUSTOM_ENVIRONMENT_VARIABLE_SETTING=1
 DBM_ENABLE_SSH_AGENT_SUPPORT_FOR_GITBASH=0
-DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION=1
 DBM_AMEND_LOCAL_PROMPT_SCRIPT=1
+DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION=1
+
+
+##----------------------------------------------------------------------
+## Information, error and warning messages:
+##----------------------------------------------------------------------
 
 DBM_MESSAGES_QUIET=0
 DBM_MESSAGES_ERRORS=1
@@ -168,7 +180,7 @@ DBM_MESSAGES_ERRORS_WARNINGS_INFO_VERBOSE=4
 
 DBM_MESSAGING_LEVEL=$DBM_MESSAGES_QUIET
 
-# --- SCRIPT VARS END ---
+# --- SECTION SCRIPT VARIABLES END ---
 
 
 
@@ -888,20 +900,6 @@ fi
 # NEED TO MOVE THIS SCRIPT VARIABLE UP TO SECTION OF FILE-SCOPED VARIABLES:
 bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
 
-if [ $DBM_ENABLE_STANDARD_COMMAND_ALIASES -eq 1 ]; then
-    if [ -e $bookmarks_dir/z--dbm--alias-standard-commands.sh ]; then
-        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
-            echo "sourcing function to set aliases for standard Linux commands"
-        fi
-        . $bookmarks_dir/z--dbm--alias-standard-commands.sh
-    else
-        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
-            echo "WARNING from DBM - no script function found to set aliases for standard Linux commands"
-        fi
-    fi
-fi
-
-
 ## 2017-12-03 - DISCOVERY:  Bash 'file exists' test returns true when 
 ## +  the argument to the file test is a zero-length string or undefined variable.
 ## +  Does Mendel Cooper's guide explain this behavior?  There was a typo
@@ -1023,17 +1021,55 @@ fi
 ## } DEVELOPMENT BLOCK END
 
 
+
+## NOTE:  following "steps" of this script carry out environment
+##  changes beyond directory book marking.  These amendments to given
+##  user's environment can be turned on and off by setting
+##  corresponding "DBM_ENABLE_" variables in this script's section
+##  with title "SCRIPT VARIABLES".
+
+##----------------------------------------------------------------------
+##  STEP - set aliases for standard Unix and Linux commands
+##----------------------------------------------------------------------
+
+if [ $DBM_ENABLE_STANDARD_COMMAND_ALIASES -eq 1 ]; then
+    if [ -e $bookmarks_dir/z--dbm--alias-standard-commands.sh ]; then
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "sourcing function to set aliases for standard Linux commands"
+        fi
+echo "- DEV - sourcing function to set aliases for standard Linux commands . . ."
+        . $bookmarks_dir/z--dbm--alias-standard-commands.sh
+    else
+        if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
+            if [ -e ./dbm-helper-scripts/z--dbm--alias-standard-commands.sh ]; then
+echo "- DEV - sourcing function to set aliases for standard Linux commands . . ."
+                aaa=`. ./dbm-helper-scripts/z--dbm--alias-standard-commands.sh`
+echo "- DEV - script to alias standard commands returns \"$aaa\","                 
+            else
+                if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+                    echo "WARNING from DBM - no script function found to set aliases for standard Linux commands"
+                fi
+            fi
+        fi
+    fi
+fi
+
+
 ##----------------------------------------------------------------------
 ##  STEP - declare and assign custom environment variables
 ##----------------------------------------------------------------------
 
-if [ -e ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh ]; then
-    . ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh
-else
+if [ $DBM_ENABLE_CUSTOM_ENVIRONMENT_VARIABLE_SETTING -eq 1 ]; then
+    if [ -e ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh ]; then
+        echo "setting user's custom shell environment variables . . ."
+        . ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh
+    else
 # DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION
-    if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
-        if [ -e ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh ]; then
-            . ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh
+        if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
+            echo "setting user's custom shell environment variables . . ."
+            if [ -e ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh ]; then
+                . ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh
+            fi
         fi
     fi
 fi
