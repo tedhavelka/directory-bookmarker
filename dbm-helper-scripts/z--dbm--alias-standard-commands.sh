@@ -4,12 +4,16 @@
 ## THIS SCRIPT:  z--dbm--alias-standard-commands.sh
 ##
 
-function set_aliases()
-{
+#set -a
+
+#function dbm_set_aliases()
+#{
 ##----------------------------------------------------------------------
 ##  PURPOSE:  set some useful aliases on standard Unix and Linux
 ##            commands.
 ##----------------------------------------------------------------------
+
+    DBM_MESSAGING_LEVEL=${1}
 
     if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then  ## <-- integer comparison here
         echo "setting some shell safety and shortcut aliases . . ."
@@ -49,8 +53,12 @@ echo "setting some shell safety and shortcut aliases . . ."
 
     alias df='df -h | grep sd; echo "( note \"df\" command aliased to \"df -h | grep sd\" )"'
 
-    return "test-helper-script-return-value"
+    return 1024
 
-} # end function set_aliases()
+#} # end function dbm_set_aliases()
+
+#set +a
+
+#export -f dbm_set_aliases
 
 

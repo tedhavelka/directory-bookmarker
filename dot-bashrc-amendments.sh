@@ -925,31 +925,33 @@ fi
     set_aliases_for_bookmarking
 
 
-##----------------------------------------------------------------------
-##  STEP - read file holding bookmarked paths
-##----------------------------------------------------------------------
-
 #    echo "- DIAG BEGIN - calling function (not alias) to clear any directory bookmarks . . ."
     clear_paths_function
 #    echo "- DIAG END - \$D1 holds '$D1'"
+
+
+##----------------------------------------------------------------------
+##  STEP - determine bookmarked paths file id from script arguments
+##----------------------------------------------------------------------
 
 ##  *  https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
 
     regex='^[0-9]+$'
     if [[ $1 =~ $regex ]]; then
         if [ "$#" -gt 0 ]; then
-            bookmarks_group_id=${1}
+            bookmarks_group_id=$1
         else
+## If script not passed valid bookmarks file ID then default to ID of 1:
             bookmarks_group_id=1
         fi
     fi
 
 
 ##----------------------------------------------------------------------
-##  STEP - determine which group of bookmarked paths to read from file
+##  STEP - when passed valid bookmarks file ID write this to rc file
 ##----------------------------------------------------------------------
 
-bookmarked_paths_group_in_script_main_line=${1}
+bookmarked_paths_group_in_script_main_line=$1
 
 if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
     if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
@@ -957,6 +959,11 @@ if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
         echo "which we support as of 2017 December."
     fi
     write_bookmarks_runtime_config ${bookmarked_paths_group_in_script_main_line}
+
+##----------------------------------------------------------------------
+##  STEP - when running without bookmarks file ID then read directory bookmarker's rc file
+##----------------------------------------------------------------------
+
 else
     if [ -z ${bookmarked_paths_group_in_script_main_line} ]; then
         if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
@@ -968,6 +975,11 @@ else
             echo "- DEV - from rc file read bookmarks group id '${bookmarks_group_id}',"
         fi
     else
+
+##----------------------------------------------------------------------
+##  STEP - may be redundant but when we see invalid bookarms file ID here set ID to default value of 1
+##----------------------------------------------------------------------
+
         if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
             echo "- NOTE - script called with unsupported bookmarks group id,"
             echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
@@ -1033,18 +1045,24 @@ fi
 ##----------------------------------------------------------------------
 
 if [ $DBM_ENABLE_STANDARD_COMMAND_ALIASES -eq 1 ]; then
-    if [ -e $bookmarks_dir/z--dbm--alias-standard-commands.sh ]; then
+#    if [ -e $bookmarks_dir/z--dbm--alias-standard-commands.sh ]; then
+    if [ ]; then
         if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
             echo "sourcing function to set aliases for standard Linux commands"
         fi
-echo "- DEV - sourcing function to set aliases for standard Linux commands . . ."
+#echo "- DEV - sourcing function to set aliases for standard Linux commands . . ."
+echo "- DEV - sourcing script to set aliases for standard Linux commands . . ."
         . $bookmarks_dir/z--dbm--alias-standard-commands.sh
+#        dbm_set_aliases
     else
         if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
             if [ -e ./dbm-helper-scripts/z--dbm--alias-standard-commands.sh ]; then
-echo "- DEV - sourcing function to set aliases for standard Linux commands . . ."
-                aaa=`. ./dbm-helper-scripts/z--dbm--alias-standard-commands.sh`
+#echo "- DEV - from second location sourcing function to set aliases for standard Linux commands . . ."
+echo "- DEV - from second location sourcing script to set aliases for standard Linux commands . . ."
+                aaa=`. ./dbm-helper-scripts/z--dbm--alias-standard-commands.sh $DBM_MESSAGING_LEVEL`
+#                aaa=`./dbm-helper-scripts/z--dbm--alias-standard-commands.sh`
 echo "- DEV - script to alias standard commands returns \"$aaa\","                 
+#                dbm_set_aliases
             else
                 if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
                     echo "WARNING from DBM - no script function found to set aliases for standard Linux commands"
@@ -1061,12 +1079,12 @@ fi
 
 if [ $DBM_ENABLE_CUSTOM_ENVIRONMENT_VARIABLE_SETTING -eq 1 ]; then
     if [ -e ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh ]; then
-        echo "setting user's custom shell environment variables . . ."
+        echo "- DEV - sourcing function to set custom shell environment variables . . ."
         . ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh
     else
 # DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION
         if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
-            echo "setting user's custom shell environment variables . . ."
+            echo "- DEV - sourcing function to set custom shell environment variables . . ."
             if [ -e ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh ]; then
                 . ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh
             fi
