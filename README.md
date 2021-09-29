@@ -86,6 +86,9 @@ Following article describes different behaviors of .bashrc and .bash_profile sta
 Some mark down references:
 *  https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf
 *  https://towardsdatascience.com/the-ultimate-markdown-cheat-sheet-3d3976b31a0
+
+2021-09-29 - need to review shell aliases and how they may be set globally:
+*  https://superuser.com/questions/319538/aliases-in-subshell-child-process
      
      
 --- END README.md for directory-bookmarker project ---
