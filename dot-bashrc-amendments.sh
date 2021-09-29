@@ -130,9 +130,8 @@ SCRIPT_NAME=${0}
 # echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
 SCRIPT_NAME="dot-bash-amendments.sh"
 
-## 2018-07-13 - added by Ted:
-SCRIPT_NAME_ABBR="dbrca"
-
+## 2018-07-13 - Directory BookMarking script
+SCRIPT_NAME_ABBR="DBM"
 
 DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
 
@@ -142,10 +141,10 @@ FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
 
 BOOKMARKS_GROUPS_SUPPORTED="1..9"
 
-# Directory Book Marker watermark, for sane $PATH amendments:
+# Directory book marker watermark, for sane $PATH amendments:
 DBM_WATERMARK="${HOME}/path-amended-by-directory-bookmarker"
 
-# . . .
+# Assign a default bookmarks group file identifier to script scoped variable:
 bookmarks_group_id=1
 
 # Shell variable used in 'sp' alias to save bookmarked paths:
@@ -155,6 +154,19 @@ index=0
 ## 2017-12-02 - How are these variables used? - TMH
 bash_settings_file="${HOME}/.bash_settings_local"
 
+
+DBM_ENABLE_STANDARD_COMMAND_ALIASES=1
+DBM_ENABLE_SSH_AGENT_SUPPORT_FOR_GITBASH=0
+DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION=1
+DBM_AMEND_LOCAL_PROMPT_SCRIPT=1
+
+DBM_MESSAGES_QUIET=0
+DBM_MESSAGES_ERRORS=1
+DBM_MESSAGES_ERRORS_WARNINGS=2
+DBM_MESSAGES_ERRORS_WARNINGS_INFO=3
+DBM_MESSAGES_ERRORS_WARNINGS_INFO_VERBOSE=4
+
+DBM_MESSAGING_LEVEL=$DBM_MESSAGES_QUIET
 
 # --- SCRIPT VARS END ---
 
@@ -174,64 +186,6 @@ function show_aliases_in_this_script()
 
     $(GREP) -n alias $0
 }
-
-
-
-function set_aliases()
-{
-##----------------------------------------------------------------------
-##  PURPOSE: . . .
-##----------------------------------------------------------------------
-
-#    echo "setting some shell safety and shortcut aliases . . ."
-
-
-## Some important shell safe-guarding aliases for Unix and Linux systems:
-
-    alias rm='rm -i'
-    alias cp='cp -i'
-    alias mv='mv -i'
-
-# list files in long format starting from a cleared screen:
-    alias lss='clear; ls -lF'
-
-# list directories only in long format:
-    alias dls='ls -l | grep "^d"'
-
-
-
-# run custom Remote UPtime script:
-    alias rup='${HOME}/bin/rup'
-
-# . . .
-    alias cvs='cvs -d ${HOME}/cvs -e /usr/bin/vi'
-
-
-# Shell shortcuts to cd to local oft used directories:
-
-    alias archive='cd ${HOME}/archive; echo "Now at `pwd`" '
-    alias bin='cd ${HOME}/bin; echo "Now at `pwd`" '
-    alias notes='cd ${HOME}/notes; echo "Now at `pwd`" '
-
-
-# 2012-01-25
-
-    alias xterm='xterm -bg black -fg white -geometry 108x36'
-    alias x='xterm -bg black -fg white -geometry 115x36 &'
-
-
-# NOTE 2017-12-02 - xlock command generally not available on last
-#  three years' Debian and Ubuntu software package mirrors.  Related
-#  command 'xscreensaver-command -lock' is installable . . .
-
-    alias xlock='/usr/bin/xlock -mode scooter -count 100'
-
-
-    alias restore-path-var='. ${HOME}/dot-bashrc-amendments.sh restore-path-variable'
-
-
-} # end function set_aliases()
-
 
 
 
@@ -350,7 +304,7 @@ alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_NAME_ABBR} - dir
 
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  Banner message at end of alias 's' . . .
+##  'show paths' alias
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 alias s='\
@@ -380,6 +334,7 @@ echo "variable D29 points to $D29";\
 echo "variable D30 points to $D30";\
 \
 echo; \
+echo "These paths from bookmarks group ${bookmarks_group_id}."
 echo EDITOR is set to: $EDITOR;\
 echo "see file dot-bashrc-amendments.sh, typically in home directory of present user,";\
 echo "for implementation of directory bookmarks and D1..D30 variables - TMH";\
@@ -528,6 +483,8 @@ echo
 echo "Note:  dot-bash-amendments script supports thirty (30) bookmarked paths per bookmarks group."
 echo'
 
+    alias restore-path-var='. ${HOME}/dot-bashrc-amendments.sh restore-path-variable'
+
 } # end function set_aliases_for_bookmarking()
 
 
@@ -615,8 +572,6 @@ function write_bookmarks_runtime_config()
 
 
 
-
-
 function read_bookmarks_file()
 {
 
@@ -626,13 +581,18 @@ function read_bookmarks_file()
 
     local bookmarked_paths_group=${2}
 
-REGEX="[1-9]"
-#    if [[ ${bookmarked_paths_group} =~ [1-5] ]] ; then
+    REGEX="[1-9]"
     if [[ ${bookmarked_paths_group} =~ ${REGEX} ]] ; then
-        echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
+        if [ $DBM_MESSAGING_LEVEL -ge $DBM_MESSAGES_ERRORS_WARNINGS_INFO ]; then
+            echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
+        fi
     else
-        echo "- NOTE - caller requests unsupported or unknown bookmarks file identified by '${2}',"
-        echo "- NOTE - defaulting to read bookmarked directories in bookmarks group 1,"
+        if [ $DBM_MESSAGING_LEVEL -ge $DBM_MESSAGES_ERRORS_WARNINGS ]; then
+            echo "- WARNING - caller requests unsupported or unknown bookmarks file identified by '${2}',"
+        fi
+        if [ $DBM_MESSAGING_LEVEL -ge $DBM_MESSAGES_ERRORS_WARNINGS_INFO ]; then
+            echo "- INFO - defaulting to read bookmarked directories in bookmarks group 1,"
+        fi
         bookmarked_paths_group=1
     fi
 
@@ -796,15 +756,27 @@ function amend_path_variable()
 ##   script called a second or successive time it does not amend the
 ##   $PATH variable with duplicate paths.  Need a test . . .   - TMH
 ##
+##  KEYWORDS:  amend PATH amend path
 ##----------------------------------------------------------------------
 
     string=`echo $PATH | grep $DBM_WATERMARK`
 
     if [ -z "$string" ]
     then
+        if [ -e ./.bookmarked-paths/local-path-amendments.sh ]; then
+            echo "amending \${PATH} with local user paths outside of dot-bashrc script . . ."
+            . ./.bookmarked-paths/local-path-amendments.sh
+        fi
+
         path_as_found=${PATH}
 
 # Amending the default path variable:
+
+# 2021-07-25 . . .
+        PATH="${PATH}":${HOME}/.local/bin
+        PATH="${PATH}":/opt/zephyr-sdk-0.12.4
+        PATH="${PATH}":/opt/zephyr-sdk-0.12.4/arm-zephyr-eabi
+        PATH="${PATH}":/opt/zephyr-sdk-0.12.4/arm-zephyr-eabi/bin
 
 #        PATH="/usr/bin:${PATH}"
         PATH="${PATH}":/sbin
@@ -813,7 +785,7 @@ function amend_path_variable()
         PATH="${PATH}":/opt/cross/bin
         PATH="${PATH}":/opt/nxp/lpcxpresso-8p2p2/lpcxpresso/tools/bin
         PATH="${PATH}":/opt/nxp/lpcxpresso-8p2p2/lpcxpresso
-        PATH="${PATH}":/opt/cross/x-tools/arm-unknown-linux-gnueabi/bin
+#        PATH="${PATH}":/opt/cross/x-tools/arm-unknown-linux-gnueabi/bin
 #        PATH="${PATH}":.
         PATH="${PATH}":${HOME}/bin
         PATH="${PATH}":/usr/local/mysql/bin
@@ -826,10 +798,12 @@ function amend_path_variable()
 # 2017-12-04 . . .
         PATH="${PATH}":~/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
 
-# 2018-01-19 - add a pattern to the path to avoid multple path variable
-#  amendments per shell session:
-        PATH="${PATH}:$DBM_WATERMARK"
+# 2021-01-31 . . .
+        PATH="${PATH}":/opt/eagle-9.6.2
 
+## 2018-01-19 - add a pattern to the path to avoid multple path variable
+##  amendments per shell session:
+        PATH="${PATH}:$DBM_WATERMARK"
     else
         echo "\$PATH variable already amended, directory book-marker leaving untouched."
     fi
@@ -845,15 +819,55 @@ function restore_path_variable_to_as_found()
 
 
 
+function find_ssh_agent_pid()
+{
+
+# 2020-10-30 FRI - work to configure ssh-agent per gitbash session:
+
+LOCAL_VAR_SSH_AGENT_RUNNING_PROCESS_COUNT=$(ps -u $USERNAME | grep agent | wc | awk '{print $1}')
+LOCAL_VAR_SSH_AGENT_VARS_FILENAME="z--ssh-agent-env-vars.txt"
+
+echo "Checking for ssh-agent daemon process:"
+
+if [ $LOCAL_VAR_SSH_AGENT_RUNNING_PROCESS_COUNT -ne 0 ]; then
+    echo "Found one or more ssh-agent processes running,"
+    if [ -e $LOCAL_VAR_SSH_AGENT_VARS_FILENAME ]; then
+        echo "Reading env variables relating to earliest started ssh-agent instance..."
+        var1=$(cat $LOCAL_VAR_SSH_AGENT_VARS_FILENAME | sed -n '1p')
+        var2=$(cat $LOCAL_VAR_SSH_AGENT_VARS_FILENAME | sed -n '2p')
+        echo "exporting $var1 to SSH_AGENT_PID env var..."
+        export SSH_AGENT_PID=$var1
+        echo "exporting $var2 to SSH_AUTH_SOCK env var..."
+        export SSH_AUTH_SOCK=$var2
+    else
+        echo "but no locally written environment vars found!"
+    fi
+else
+    echo "none found, starting..."
+    eval $(/usr/bin/ssh-agent -s)
+    /usr/bin/ssh-add $HOME/.ssh/id-ed25519-key
+    var3=$(set | grep SSH_AGENT_PID | cut -d'=' -f 2)
+    var4=$(set | grep SSH_AUTH_SOCK | cut -d'=' -f 2)
+    echo "var3 holds $var3"
+    echo "var4 holds $var4"
+    echo "Writing these variables to file for future Gitbash shell instances to read..."
+    echo $var3 > $LOCAL_VAR_SSH_AGENT_VARS_FILENAME
+    echo $var4 >> $LOCAL_VAR_SSH_AGENT_VARS_FILENAME
+fi
+
+}
+
 
 
 ##----------------------------------------------------------------------
 ##
-##  SECTION - main-line code of dot-bash-amendments.sh
+##  SECTION - main line code of dot-bash-amendments.sh
 ##
 ##----------------------------------------------------------------------
 
-echo "starting,"
+if [ $DBM_MESSAGING_LEVEL -gt $DBM_MESSAGES_QUIET ]; then
+    echo "starting,"
+fi
 
 ## Following test fails when script passed an argument, should succeed . . .
 #if [[ "$ARGC" -eq "1" ]]; then
@@ -861,48 +875,56 @@ echo "starting,"
 #fi
 
 ## Following test succeeds:
-if [[ "$#" -eq "1" ]]; then
+#if [[ "$#" -eq "1" ]]; then
+if [ $# -eq 1 ]; then
     echo "called with first argument set to '$1',"
 #    echo "calling 'read directory bookmarks file' with no arguments . . ."
 #    read_bookmarks_file
+else
+    echo "called with $# arguments, parsing implementation underway 2021-09-28 . . ."
 fi
 
 
-
-## Note:  single brackets in the following test work, double brackets
-##  seem to evaulate differently, may be because we're using a shell
-##  file test . . .
-
+# NEED TO MOVE THIS SCRIPT VARIABLE UP TO SECTION OF FILE-SCOPED VARIABLES:
 bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
 
-# echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
-## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when 
-## +  the argument to the file test is a zero-length string?  Or undefined variable?
-## +  Does Mendel Cooper's guide explain this behavior?  There was a type 
+if [ $DBM_ENABLE_STANDARD_COMMAND_ALIASES -eq 1 ]; then
+    if [ -e $bookmarks_dir/z--dbm--alias-standard-commands.sh ]; then
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "sourcing function to set aliases for standard Linux commands"
+        fi
+        . $bookmarks_dir/z--dbm--alias-standard-commands.sh
+    else
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "WARNING from DBM - no script function found to set aliases for standard Linux commands"
+        fi
+    fi
+fi
+
+
+## 2017-12-03 - DISCOVERY:  Bash 'file exists' test returns true when 
+## +  the argument to the file test is a zero-length string or undefined variable.
+## +  Does Mendel Cooper's guide explain this behavior?  There was a typo
 ## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
 
 if [ -e ${bookmarks_dir} ]; then
-#    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
-    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory." > /dev/null
+    if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+#        echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
+        echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory." > /dev/null
+    fi
 else
-#    echo "creating directory ${bookmarks_dir} . . ."
+    if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+        echo "creating directory ${bookmarks_dir} . . ."
+    fi
     mkdir -pv ${bookmarks_dir}
 fi
 
 
-
 ##----------------------------------------------------------------------
-##  STEP:  set shell aliases . . . moved to two functions of this script
+##  STEP:  set shell aliases specific to directory, path bookmarking
 ##----------------------------------------------------------------------
-
-    set_aliases
 
     set_aliases_for_bookmarking
-
-#    echo "- DIAG BEGIN - calling builtin shell command 'alias' to check aliases just set:"
-#    alias
-#    echo "- DIAG END -"
-
 
 
 ##----------------------------------------------------------------------
@@ -915,54 +937,75 @@ fi
 
 ##  *  https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
 
-     re='^[0-9]+$'
-     if [[ $1 =~ $re ]]; then
+    regex='^[0-9]+$'
+    if [[ $1 =~ $regex ]]; then
         if [ "$#" -gt 0 ]; then
             bookmarks_group_id=${1}
         else
             bookmarks_group_id=1
         fi
-     fi
-
+    fi
 
 
 ##----------------------------------------------------------------------
-##  STEP - check for valid bookmarks group identifier, should be
-##  an integer value between 1 and 9 for now, 2017 December:
+##  STEP - determine which group of bookmarked paths to read from file
 ##----------------------------------------------------------------------
 
 bookmarked_paths_group_in_script_main_line=${1}
 
 if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
-    echo "script called with bookmarks group number ${bookmarked_paths_group_in_script_main_line}, in range ${BOOKMARKS_GROUPS_SUPPORTED}"
-    echo "which we support as of 2017 December."
+    if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+        echo "script called with bookmarks group number ${bookmarked_paths_group_in_script_main_line}, in range ${BOOKMARKS_GROUPS_SUPPORTED}"
+        echo "which we support as of 2017 December."
+    fi
     write_bookmarks_runtime_config ${bookmarked_paths_group_in_script_main_line}
 else
     if [ -z ${bookmarked_paths_group_in_script_main_line} ]; then
-#        echo "setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
-#        bookmarked_paths_group_in_script_main_line=1
-
-        echo "script called without bookmarked paths group specified,"
-        echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "script called without bookmarked paths group specified,"
+            echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
+        fi
         bookmarks_group_id=$(read_bookmarks_runtime_config)
-        echo "- DEV - from rc file read bookmarks group id '${bookmarks_group_id}',"
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "- DEV - from rc file read bookmarks group id '${bookmarks_group_id}',"
+        fi
     else
-        echo "- NOTE - script called with unsupported bookmarks group id,"
-        echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
-        echo "- NOTE - setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
+        if [ $DBM_MESSAGING_LEVEL -eq 1 ]; then
+            echo "- NOTE - script called with unsupported bookmarks group id,"
+            echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
+            echo "- NOTE - setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
+        fi
         bookmarked_paths_group_in_script_main_line=1
     fi
 fi
 
 
-# echo "calling bash amendments function to read run-time config file . . ."
-# read_bookmarks_runtime_config
+##----------------------------------------------------------------------
+##  STEP - read bookmarked paths from file
+##----------------------------------------------------------------------
 
-echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
+if [ $DBM_MESSAGING_LEVEL -ge $DBM_MESSAGES_ERRORS_WARNINGS_INFO_VERBOSE ]; then
+    echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
+fi
 read_bookmarks_file $0 ${bookmarks_group_id}
 
 
+##----------------------------------------------------------------------
+##  STEP - amend or restore given user PATH variable
+##----------------------------------------------------------------------
 
+    if [ "$1" == "restore-path-variable" ]; then 
+## NEED TO TEST WHETHER RESTORE VALUE OF PATH VARIABLE IS CORRECT ON
+## SECOND AND SUCCESSIVE EXECUTIONS OF THIS SCRIPT IN A MULTIPLE
+## LOGIN SCENARIO FOR A SINGLE USER (THIS MAY NOT WORK AS DESIGNED):
+echo "- dbm - RESTORING PATH VARIABLE . . ."
+        restore_path_variable_to_as_found
+    else
+        amend_path_variable
+    fi
+
+
+## { DEVELOPMENT BLOCK BEGIN
 
 ## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1:
 
@@ -977,79 +1020,44 @@ if [ ]; then
     echo ""
 fi
 
-
+## } DEVELOPMENT BLOCK END
 
 
 ##----------------------------------------------------------------------
-##  STEP - amend environment variables
+##  STEP - declare and assign custom environment variables
 ##----------------------------------------------------------------------
 
-#
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-##  NOTE - path environment variable amendments, mostly for
-##   work on Debian and Ubuntu Linux based systems
-##
-##  NOTE - when $PATH variable includes present working directory, e.g.
-##   "." then buildroot 2.x complains and bails during project
-##   compilation.  For smooth buildroot project builds, keep the 
-##   current working directory commented out.  Safer to run programs
-##   in cwd using ./[program_name] syntax anyway . . .  - TMH
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#
-
-# Amending the default path variable:
-
-    if [ "$1" == "restore-path-variable" ]; then 
-echo "- dbm - RESTORING PATH VARIABLE . . ."
-        restore_path_variable_to_as_found
-    else
-        amend_path_variable
+if [ -e ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh ]; then
+    . ${bookmarks_dir}/z--dbm--set-custom-environment-vars.sh
+else
+# DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION
+    if [ $DBM_LOOK_FOR_HELPER_SCRIPTS_IN_DEFAULT_AND_DEV_LOCATION -eq 1 ]; then
+        if [ -e ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh ]; then
+            . ./dbm-helper-scripts/z--dbm--set-custom-environment-vars.sh
+        fi
     fi
-
-
-# Concurrent Versions System (CVS) variables:
-
-    CVSROOT="/home/fulano/cvs"
-    CVS_RSH=""
-#    export EDITOR=/usr/bin/vim . . . commented out 2012-01-25 - TMH
-    export EDITOR=/usr/bin/vi
-    HISTSIZE=1000
-    HISTFILESIZE=1000
-
-# Variables as shortcuts:
-
-    archive=${HOME}/archive
-
-# Enable tsocks transparent proxy service by setting this environment
-# variable:
-
-## Note - needed back in 2004, 2005 for to enable proxy server
-##  settings . . .
-
-#    export LD_PRELOAD=/lib/libtsocks.so.1.8
-#    export LD_PRELOAD=/usr/lib/libtsocks.so.1.8
-
+fi
 
 
 ##----------------------------------------------------------------------
-##  2014-02-19 - added by Ted . . .
-##
-##  STEP - cross compile variables to export
-##
-##  reference http://www.x.org/wiki/CrossCompilingXorg/
+##  STEP - modify default regular user prompt string setting
 ##----------------------------------------------------------------------
 
-# export CROSS_COMPILE=arm-none-linux-gnueabi-
-export CROSS_COMPILE=arm-unknown-linux-gnueabi-
+## 2021-08-15 - Amending prompt string to keep local hostname private:
+# PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+if [ $DBM_AMEND_LOCAL_PROMPT_SCRIPT -eq 1 ]; then
+    echo "amending PS1,"
+    PS1='${debian_chroot:+($debian_chroot)}\u@localhost:\w\$ '
+fi
 
-export SESSION_MANAGER=lightdm
+
+## 2021-09-20 - Searching for ssh-agent process to obtain PID
+find_ssh_agent_pid
 
 
-# . ~/.bookmarked-paths/set-proxies.sh
-
-
-echo "done."
-
+if [ $DBM_MESSAGING_LEVEL -ge $DBM_MESSAGES_ERRORS_WARNINGS_INFO ]; then
+    echo "done."
+fi
 
 
 # EOF ( end of file )
