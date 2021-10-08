@@ -92,8 +92,10 @@ In particular tasks or functions 3 and 4 are most particular to given end users,
 ## REFERENCES:
 For all things shell scripting:
 *  https://tldp.org/LDP/abs/html/index.html
+
 Following article describes different behaviors of .bashrc and .bash_profile start up scripts:
 *  https://dev.to/awwsmm/setting-up-an-ubuntu-vm-on-windows-server-2g23
+
 Some mark down references:
 *  https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf
 *  https://towardsdatascience.com/the-ultimate-markdown-cheat-sheet-3d3976b31a0
