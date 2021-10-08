@@ -44,6 +44,27 @@ Notes:
 ## TO-DO
 This section mentions bookmarker features underway or to be added.  Contributor Ted noting there is much clean-up work to do in this shell script.  Present outstanding improvements sorted roughly by date of posting include:
 
+
+- 2021-10-08 -
+
+[ ]  restore alias assignments to shell function within file 'dot-bashrc-amendments.sh'
+     _( this task underway, not yet merged from other branch into 'master' branch )_
+
+- 2021-09-24 FRI -
+
+[ ]  add support for paths which contain white space
+
+
+- 2021-08-14 MON -
+
+[ ]  script review and clean up, line by line
+     _( this task underway )_
+
+[ ]  factor to separate file amendments to $PATH env variable
+
+[ ]  factor to separate file declarations and assignments to custom env variables
+
+
 - 2017-12-14 THU -
 
 [ ]  write a separate use and help file for the directory bookmarking script,
@@ -53,19 +74,6 @@ This section mentions bookmarker features underway or to be added.  Contributor 
 
 [ ]  add summary report of number of bookmark groups defined, their names, first few entries
 
-
-- 2021-08-14 MON -
-
-[ ]  script review and clean up, line by line
-
-[ ]  factor to separate file amendments to $PATH env variable
-
-[ ]  factor to separate file declarations and assignments to custom env variables
-
-
-- 2021-09-24 FRI -
-
-[ ]  add support for paths which contain white space
 
 
 A summary comment on directory bookmarker "to do" tasks, there are as of 2021 August four areas of script action which contributor Ted looking to factor into separate shell scripts.  These script actions include:
@@ -78,7 +86,7 @@ A summary comment on directory bookmarker "to do" tasks, there are as of 2021 Au
 In particular tasks or functions 3 and 4 are most particular to given end users, and are not related to the convenience of storing (bookmarking) often visited paths.  Directory bookmarker is not huge, but it has grown over some years and is harder to maintain in a clean, concise fashion.  Such a factoring of environmental configuration tasks could make the bookmarker project easier to use and develop.
 
 
-## RERFERENCES:
+## REFERENCES:
 For all things shell scripting:
 *  https://tldp.org/LDP/abs/html/index.html
 Following article describes different behaviors of .bashrc and .bash_profile start up scripts:
