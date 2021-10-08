@@ -27,7 +27,7 @@ Note that the main script can also be installed in some alternate directory, suc
 
 
 ## BASIC USE:
-Using a Unis or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
+Using a Unix or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
 
 *  's'           to show bookmarked full paths to directories,
 *  'sdn'         to set bookmark n of 30, where n is a positive integer in the set 1..30
@@ -49,6 +49,9 @@ This section mentions bookmarker features underway or to be added.  Contributor 
 
 [ ]  restore alias assignments to shell function within file 'dot-bashrc-amendments.sh'
      _( this task underway, not yet merged from other branch into 'master' branch )_
+     
+[ ]  test script when installed in locations differing from ${HOME}     
+     
 
 - 2021-09-24 FRI -
 
