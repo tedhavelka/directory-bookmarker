@@ -5,10 +5,8 @@
 ## OVERVIEW:
 Command line, directory bookmarking facility written in Bourne Again shell.  Really a path bookmarking facility.  Useful for work situations where multiple directories need be accessed and visited often from the command line.
 
-
 ## WHERE SUPPORTED:
 Works in Unix and Linux shell environments, including Gitbash on Windows hosts.  Typically installed in given user's home directory.  Won't automatically run by its presence alone, but easy to activate automatically at login by sourcing this script from a standard shell login script such as .bashrc.
-
 
 ## INSTALL AND ENABLING:
 Typical installation steps include,
@@ -25,7 +23,6 @@ fi
 
 Note that the main script can also be installed in some alternate directory, such as a subdirectory of the end user or a shared system directly like /usr/local/bin or /usr/local/bin/startup.  When directory bookmarker script is installed in a path other than path of .bashrc or .bash_login, the above sourcing lines need be amended to spell out that path.  The bookmarking script can also be renamed.  In that case, again the .bashrc or .bash_profile lines to source directory bookmarker need to be amended with the alternate name of this script.
 
-
 ## BASIC USE:
 Using a Unix or Linux shell which supports the `alias` command, this directory bookmarker script provides among its aliases the following shorthand patterns to set, to show, to navigate and further manage multiple directory paths:
 
@@ -40,33 +37,31 @@ Using a Unix or Linux shell which supports the `alias` command, this directory b
 Notes:
 (1)  bookmarker script alias `clearpaths` does not alter a user's present ${PATH} environment variable.  This alias only sets all the bookmarker variables to the null string "".
 
-
 ## TO-DO
 This section mentions bookmarker features underway or to be added.  Contributor Ted noting there is much clean-up work to do in this shell script.  Present outstanding improvements sorted roughly by date of posting include:
 
+- 2025-11-05 WED -
+
+[ ]  Refactor sole main script into three scripts, one yet a main script and the others focused on features:
+    (1)  bookmark managing script, the primary script
+    (2)  aliases scripts to support custom aliases in an encapsulated way
+    (3)  environment vars export script
+
+    . . . Implement these in part using the recent gained knowledge on the use of sourcing scripts and then calling their functions.
 
 - 2021-10-08 -
-
-[ ]  restore alias assignments to shell function within file 'dot-bashrc-amendments.sh'
-     _( this task underway, not yet merged from other branch into 'master' branch )_
      
 [ ]  test script when installed in locations differing from ${HOME}     
      
-
 - 2021-09-24 FRI -
 
 [ ]  add support for paths which contain white space
-
+   . . . explore and as possible use recent observation of behavior of double quotes in variable expansions.
 
 - 2021-08-14 MON -
 
 [ ]  script review and clean up, line by line
      _( this task underway )_
-
-[ ]  factor to separate file amendments to $PATH env variable
-
-[ ]  factor to separate file declarations and assignments to custom env variables
-
 
 - 2017-12-14 THU -
 
@@ -77,8 +72,6 @@ This section mentions bookmarker features underway or to be added.  Contributor 
 
 [ ]  add summary report of number of bookmark groups defined, their names, first few entries
 
-
-
 A summary comment on directory bookmarker "to do" tasks, there are as of 2021 August four areas of script action which contributor Ted looking to factor into separate shell scripts.  These script actions include:
 
 1.  script help contents and display routine
@@ -87,7 +80,6 @@ A summary comment on directory bookmarker "to do" tasks, there are as of 2021 Au
 4.  custom environment variable declarations and assignments
 
 In particular tasks or functions 3 and 4 are most particular to given end users, and are not related to the convenience of storing (bookmarking) often visited paths.  Directory bookmarker is not huge, but it has grown over some years and is harder to maintain in a clean, concise fashion.  Such a factoring of environmental configuration tasks could make the bookmarker project easier to use and develop.
-
 
 ## REFERENCES:
 For all things shell scripting:
