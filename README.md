@@ -43,11 +43,12 @@ This section mentions bookmarker features underway or to be added.  Contributor 
 - 2025-11-05 WED -
 
 [ ]  Refactor sole main script into three scripts, one yet a main script and the others focused on features:
-    (1)  bookmark managing script, the primary script
-    (2)  aliases scripts to support custom aliases in an encapsulated way
-    (3)  environment vars export script
 
-    . . . Implement these in part using the recent gained knowledge on the use of sourcing scripts and then calling their functions.
+(1)  bookmark managing script, the primary script
+(2)  aliases scripts to support custom aliases in an encapsulated way
+(3)  environment vars export script
+
+. . . Implement these in part using the recent gained knowledge on the use of sourcing scripts and then calling their functions.
 
 - 2021-10-08 -
      
