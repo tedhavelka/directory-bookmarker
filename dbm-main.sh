@@ -747,8 +747,13 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
     archive=${HOME}/archive
 
 # Call directory bookmarks script to set custom aliases:
-if [ -e .bookmarked-paths/scripts/aliases.sh ]; then
-    . .bookmarked-paths/scripts/aliases.sh
+
+## if [ -e .bookmarked-paths/scripts/aliases.sh ]; then
+##     . .bookmarked-paths/scripts/aliases.sh
+## else
+
+if [ -e ./scripts/aliases.sh ]; then
+    . ./scripts/aliases.sh
 else
     echo "- NOTICE - no directory bookmarks helper found to set custom aliases"
 fi
