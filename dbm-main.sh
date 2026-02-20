@@ -1,169 +1,8 @@
 #!/bin/bash
 
-##----------------------------------------------------------------------
-##
-##
-##  FILE:  .bashrc-amendments, also named dot-bashrc-amendments.sh
-##
-##
-##  LAST TOUCHED:  2017-12-14 THU
-##
-##
-##  DESCRIPTION:  short script to amend Debian and Ubuntu and or
-##    Bourne shell run-time config file, normally named '.bashrc'.
-##    Adds directory book-marking for up to thirty directories -- or
-##    file system paths -- making these accessible by means of
-##    three- and four- character aliases of the form 'gdnn' where
-##    nn is an integer in the range 1 to 30.
-##
-##
-##  HOW TO USE THIS SCRIPT:
-##
-##    To enjoy directory bookmark aliases in this file, in a bash
-##    command line environment, the user may source this file by
-##    hand,
-##
-##    $ . dot-bashrc-amendments.sh
-##
-##    or alternately for convenience a given user may amend their
-##    .login or .bashrc start-up script to include a line which
-##    does the same sourcing of this file.
-##
-##
-##
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-##
-##  NOTES ON IMPLEMENTATION:
-##
-##   (1) When this script is called with no arguments, it reads a run-
-##     time config file to determine which group of file-stored,
-##     bookmarked paths to read into shell variables and to make readily
-##     accessible via path navigation aliases.  If the run-time config
-##     is not found the shell creates it and populates it with its
-##     identifier '1' for the first group among 1..9 supported groups
-##     of path (also referred to as directory) bookmarks.
-##
-##   (2) When this script is called with a first argument in the range
-##     1..9, a single character number representation, the script
-##     writes this number to its run-time config file, and uses this
-##     number to choose among groups of saved paths written to the
-##     given user's dot-bashrc-amendments stored path files.  If not
-##     called with a valid bookmarks group id, this script falls back
-##     to doing the tasks in (1)
-##
-##
-##
-##
-##  TO DO:
-##
-##    [ ]  add to this script function which detects and shows
-##         the script's own aliases, and another function(s) to
-##         allow user to change aliases, e.g. in event that alias
-##         conflicts with a locally installed command,
-##
-##    [ ]  add to this script the ability to open arbitrary text
-##         file containing bookmarked paths, and to show it without
-##         replacing present bookmarks,
-##
-##    [ ]  add to this script a function to show bookmarks it
-##         holds and status of whether each given bookmark exists
-##         as a valid path on the local file system,
-##
-##    [ ]  2017-12-02 - add parameters sanity check to routine 'read_bookmarks_file',
-##
-##    [ ]  2017-12-02 - add settings file to store latest selected group of bookmarks,
-##
-##
-##
-##
-##
-##  TO CONFIRM:
-##
-##    [ ]  2017-12-02 - make sure that variable 'index' is visible in 
-##         the scope of the script which sets the alias 'sp' which
-##         saves bookmarked paths,
-##
-##
-##
-##  REFERENCES:
-##
-##    See 'The Linux Documentation Project' at http://tldp.org/
-##
-##    *  http://tldp.org/LDP/abs/html/testconstructs.html . . . [, [[ ]], (( )) - builtin test,
-##         extended test, arithmetic test in bash context
-##
-##    *  http://tldp.org/LDP/abs/html/testbranch.html     . . . note shell 'shift' parameters operator
-##
-##    *  http://tldp.org/LDP/abs/html/complexfunct.html   . . . $1 $2 are first parameters to shell functions
-##
-##    *  http://www.grymoire.com/Unix/Sed.html
-##
-##    *  https://www.cyberciti.biz/faq/unix-howto-read-line-by-line-from-file/
-##
-##    *  http://www.linuxjournal.com/content/return-values-bash-functions
-##
-##
-##
-##  AUTHORS AND MAINTAINERS:
-##
-##    Ted Havelka, ted@cs.pdx.edu
-##
-##
-##
-##----------------------------------------------------------------------
-
-
-
-##----------------------------------------------------------------------
-##  SECTION - script variables of directory-bookmarker project
-##----------------------------------------------------------------------
-
-# --- SCRIPT VARS BEGIN ---
-
-GREP=/bin/grep
-SED=/bin/sed
-
-
-SCRIPT_NAME=${0}
-# echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
-SCRIPT_NAME="dot-bash-amendments.sh"
-
-## 2018-07-13 - added by Ted:
-SCRIPT_NAME_ABBR="dbrca"
-
-
-DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
-
-FILENAME_FORM_OF_BOOKMARKED_PATHS="bookmarked-paths-nn.txt"
-
-FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
-
-BOOKMARKS_GROUPS_SUPPORTED="1..9"
-
-# Directory Book Marker watermark, for sane $PATH amendments:
-DBM_WATERMARK="${HOME}/path-amended-by-directory-bookmarker"
-
-# . . .
-bookmarks_group_id=1
-
-# Shell variable used in 'sp' alias to save bookmarked paths:
-index=0
-
-
-## 2017-12-02 - How are these variables used? - TMH
-bash_settings_file="${HOME}/.bash_settings_local"
-
-
-# --- SCRIPT VARS END ---
-
-
-
-
-##----------------------------------------------------------------------
-##  SECTION - script functions
-##----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# - SECTION - script functions
+# ----------------------------------------------------------------------
 
 function show_aliases_in_this_script()
 {
@@ -172,75 +11,14 @@ function show_aliases_in_this_script()
 ##  commands (which are also comments), which this function's name
 ##  does not indicate.  NEED to fix this or rename this function . . .
 
-    $(GREP) -n alias $0
+    $(GREP) -n 'alias ' $0
 }
-
-
-
-function set_aliases()
-{
-##----------------------------------------------------------------------
-##  PURPOSE: . . .
-##----------------------------------------------------------------------
-
-#    echo "setting some shell safety and shortcut aliases . . ."
-
-
-## Some important shell safe-guarding aliases for Unix and Linux systems:
-
-    alias rm='rm -i'
-    alias cp='cp -i'
-    alias mv='mv -i'
-
-# list files in long format starting from a cleared screen:
-    alias lss='clear; ls -lF'
-
-# list directories only in long format:
-    alias dls='ls -l | grep "^d"'
-
-
-
-# run custom Remote UPtime script:
-    alias rup='${HOME}/bin/rup'
-
-# . . .
-    alias cvs='cvs -d ${HOME}/cvs -e /usr/bin/vi'
-
-
-# Shell shortcuts to cd to local oft used directories:
-
-    alias archive='cd ${HOME}/archive; echo "Now at `pwd`" '
-    alias bin='cd ${HOME}/bin; echo "Now at `pwd`" '
-    alias notes='cd ${HOME}/notes; echo "Now at `pwd`" '
-
-
-# 2012-01-25
-
-    alias xterm='xterm -bg black -fg white -geometry 108x36'
-    alias x='xterm -bg black -fg white -geometry 115x36 &'
-
-
-# NOTE 2017-12-02 - xlock command generally not available on last
-#  three years' Debian and Ubuntu software package mirrors.  Related
-#  command 'xscreensaver-command -lock' is installable . . .
-
-    alias xlock='/usr/bin/xlock -mode scooter -count 100'
-
-
-    alias restore-path-var='. ${HOME}/dot-bashrc-amendments.sh restore-path-variable'
-
-
-} # end function set_aliases()
-
-
-
 
 function set_aliases_for_bookmarking()
 {
-
 #    echo "setting aliases for bookmarking of paths . . ."
 
-    alias cb='echo "active directory bookmarks group presently set to group ${bookmarks_group_id},"'
+    alias cb='echo "directory bookmarks group set to group ${bookmarks_group_id},"'
 
 #---------------------------------------------------------------------
 # STEP:  create aliases for saving paths and returning to paths
@@ -291,7 +69,6 @@ function set_aliases_for_bookmarking()
 #    echo "- TEST - setting alias SD31 . . ."
     alias sd31='echo "Doh, thirty one bookmarks not supported!"'
 
-
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## 1024  cd foo; echo $?
 ## 1025  cd foo; echo $?; if (( $? && 1 )); then echo "dir not found!"; else echo "now at $PWD"; fi
@@ -299,12 +76,12 @@ function set_aliases_for_bookmarking()
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ## 2018-07-13 - added by Ted for improved notices when selected dir not found:
-alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_NAME_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
+alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
 
 # navigation to bookmarked directories 1 through 10:
 
 #    alias gd1='cd $D1; echo "Now at $D1" '
-    alias gd1='cd $D1; if (( $? && 1 )); then echo "- ${SCRIPT_NAME_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
+    alias gd1='cd $D1; if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
     alias gd2='cd $D2; announce_new_dir'
     alias gd3='cd $D3; announce_new_dir'
     alias gd4='cd $D4; announce_new_dir'
@@ -339,20 +116,16 @@ alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_NAME_ABBR} - dir
     alias gd25='cd $D25; announce_new_dir'
 
     alias gd26='cd $D26; announce_new_dir'
-    alias gd27='cd $D27; if (( $? && 1 )); then echo "- ${SCRIPT_NAME_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
+    alias gd27='cd $D27; if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
     alias gd28='cd $D28; announce_new_dir'
     alias gd29='cd $D29; announce_new_dir'
     alias gd30='cd $D30; announce_new_dir'
-
-
-
-
-
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ##  Banner message at end of alias 's' . . .
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+echo "M1"
 alias s='\
 echo
 echo "Bookmarked paths in bookmarks group ${bookmarks_group_id} are:"
@@ -389,10 +162,6 @@ echo'
 
 ##------------------------------------------------------------------------------
 
-
-
-
-
 alias sp='bookmarked_path[0]="zztop"; 
    bookmarked_path[1]=$D1;    bookmarked_path[2]=$D2;    bookmarked_path[3]=$D3;    bookmarked_path[4]=$D4;    bookmarked_path[5]=$D5; 
    bookmarked_path[6]=$D6;    bookmarked_path[7]=$D7;    bookmarked_path[8]=$D8;    bookmarked_path[9]=$D9;   bookmarked_path[10]=$D10; 
@@ -413,8 +182,6 @@ alias sp='bookmarked_path[0]="zztop";
       echo ${bookmarked_path[$index]} >> $filename; 
   done'
 
-
-
 # alias clearpaths='\
 # echo "Clearing bookmarked paths in present shell . . ." \
 # echo "Note:  bookmarked paths in bookmarks group ${bookmarks_group_id} still stored in ${filename}" \
@@ -426,7 +193,6 @@ alias sp='bookmarked_path[0]="zztop";
 # \
 # export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
 # export D26=""; export D27=""; export D28=""; export D29=""; export D30="";'
-
 
 ## 2017-12-14 - unexpected new behavior observed when backslash characters
 ##  appear in alias defining statement above, removing those:
@@ -443,8 +209,6 @@ export D16=""; export D17=""; export D18=""; export D19=""; export D20=""; \
 \
 export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
 export D26=""; export D27=""; export D28=""; export D29=""; export D30="";'
-
-
 
 # 2017-12-02 - NEED TO ADDRESS INTENT AND ACTION OF load-paths:
 # This alias likely doesn't work as intended, to load one set
@@ -485,7 +249,6 @@ export D29=${bookmarked_path[29]}; \
 export D30=${bookmarked_path[30]}; \
 echo "Loaded user-saved paths:"; s'
 
-
 # Aliases to load different groups of bookmarked paths:
 
     alias lp1='. ${HOME}/dot-bashrc-amendments.sh 1'
@@ -499,7 +262,6 @@ echo "Loaded user-saved paths:"; s'
     alias lp8='. ${HOME}/dot-bashrc-amendments.sh 8'
     alias lp9='. ${HOME}/dot-bashrc-amendments.sh 9'
     alias lp10='. ${HOME}/dot-bashrc-amendments.sh 10'
-
 
 # 2017-12-14 - Alias 'show non-empty bookmarks' added by Ted:
 
@@ -528,28 +290,18 @@ echo
 echo "Note:  dot-bash-amendments script supports thirty (30) bookmarked paths per bookmarks group."
 echo'
 
-} # end function set_aliases_for_bookmarking()
-
-
-
+}
 
 function read_bookmarks_runtime_config()
 {
-
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## VARS BEGIN
-
     local rname="read_bookmarks_runtime_config"
-
     local line="DEFAULT_LINE_TO_BE_READ_FROM_FILE"
-
     local bookmarks_group_id=""
-
 ## VARS END
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
-
-
 #    echo "* * * SCRIPT FUNCTION ${rname}() IMPLEMENTATION UNDERWAY * * *"
 
     filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
@@ -579,9 +331,6 @@ function read_bookmarks_runtime_config()
 #    echo ${bookmarks_group_id}
 
 } # end function read_bookmarks_runtime_config()
-
-
-
 
 function write_bookmarks_runtime_config()
 {
@@ -613,10 +362,6 @@ function write_bookmarks_runtime_config()
     fi
 }
 
-
-
-
-
 function read_bookmarks_file()
 {
 
@@ -627,7 +372,6 @@ function read_bookmarks_file()
     local bookmarked_paths_group=${2}
 
 REGEX="[1-9]"
-#    if [[ ${bookmarked_paths_group} =~ [1-5] ]] ; then
     if [[ ${bookmarked_paths_group} =~ ${REGEX} ]] ; then
         echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
     else
@@ -636,7 +380,6 @@ REGEX="[1-9]"
         bookmarked_paths_group=1
     fi
 
-##    bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${2}/)
     bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${bookmarked_paths_group}/)
 
     echo "will read bookmarks from file named ${bookmarks_filename},"
@@ -657,26 +400,18 @@ REGEX="[1-9]"
 # export ${bookmarked_path[4]}
 # export ${bookmarked_path[5]}
 
-
-
 ##----------------------------------------------------------------------
 ##  STEP:  retrieve saved paths from previous user session
 ##----------------------------------------------------------------------
 
-# filename="${HOME}/.bash_paths_saved"
-# filename="${HOME}/bookmarked-paths.txt"  . . . commmented 2017-12-02 SAT
 filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${bookmarks_filename}
 
 ## 2017-02-09 THU - To be added, support for storing and perusing multiple directory bookmarks files:
 filename__list_of_bookmark_files="${HOME}/bookmarked-path-files.txt"
 
-
-
 # REFERENCE:  http://tldp.org/LDP/abs/html/arrays.html
 
 declare -a bookmarked_path=()
-
-
 
 if [ -e ${filename} ]; then
     bookmarked_path=( $(cat "$filename") )  #  Stores contents of this script
@@ -690,7 +425,6 @@ else
     return
 fi
 
-
     if [ ]; then
         echo ""
         echo "- DIAG START -"
@@ -701,7 +435,6 @@ fi
         echo "- DIAG END -"
         echo ""
     fi
-
 
 # 2006-11-27
 # Prior to storing user-saved paths in a local file, path
@@ -750,7 +483,6 @@ fi
     export D29=${bookmarked_path[29]}
     export D30=${bookmarked_path[30]}
 
-
     if [ ]; then
         echo ""
         echo "- DIAG START -"
@@ -761,12 +493,7 @@ fi
         echo "- DIAG END -"
         echo ""
     fi
-
-
 } # end function read_bookmarks_file()
-
-
-
 
 function clear_paths_function()
 {
@@ -783,9 +510,6 @@ function clear_paths_function()
     export D26=""; export D27=""; export D28=""; export D29=""; export D30="";
 
 }
-
-
-
 
 function amend_path_variable()
 {
@@ -806,7 +530,7 @@ function amend_path_variable()
 
 # Amending the default path variable:
 
-#        PATH="/usr/bin:${PATH}"
+        PATH="${PATH}":${HOME}/.local/bin
         PATH="${PATH}":/sbin
         PATH="${PATH}":/usr/sbin
         PATH="${PATH}":/opt/bin
@@ -814,7 +538,6 @@ function amend_path_variable()
         PATH="${PATH}":/opt/nxp/lpcxpresso-8p2p2/lpcxpresso/tools/bin
         PATH="${PATH}":/opt/nxp/lpcxpresso-8p2p2/lpcxpresso
         PATH="${PATH}":/opt/cross/x-tools/arm-unknown-linux-gnueabi/bin
-#        PATH="${PATH}":.
         PATH="${PATH}":${HOME}/bin
         PATH="${PATH}":/usr/local/mysql/bin
         PATH="${PATH}":/usr/lib/xscreensaver
@@ -826,6 +549,9 @@ function amend_path_variable()
 # 2017-12-04 . . .
         PATH="${PATH}":~/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
 
+# 2026-01-26
+        PATH="${PATH}":$HOME/.bookmarked-paths/scripts/helpers
+
 # 2018-01-19 - add a pattern to the path to avoid multple path variable
 #  amendments per shell session:
         PATH="${PATH}:$DBM_WATERMARK"
@@ -836,22 +562,46 @@ function amend_path_variable()
 
 }
 
-
-
 function restore_path_variable_to_as_found()
 {
     PATH=$path_as_found
 }
 
+# ----------------------------------------------------------------------
+# - SECTION - akin to int main
+# ----------------------------------------------------------------------
 
+# --- SCRIPT VARS BEGIN ---
 
+GREP=/bin/grep
+SED=/bin/sed
 
+SCRIPT_NAME_BY_INVOCATION=$0
+# echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
+SCRIPT_NAME="dot-bash-amendments.sh"
+SCRIPT_ABBR="dbm"
 
-##----------------------------------------------------------------------
-##
-##  SECTION - main-line code of dot-bash-amendments.sh
-##
-##----------------------------------------------------------------------
+DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
+
+FILENAME_FORM_OF_BOOKMARKED_PATHS="bookmarked-paths-nn.txt"
+
+FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
+
+BOOKMARKS_GROUPS_SUPPORTED="1..9"
+
+# Directory Book Marker watermark, for sane $PATH amendments:
+DBM_WATERMARK="${HOME}/path-amended-by-directory-bookmarker"
+
+# . . .
+bookmarks_group_id=1
+
+# Shell variable used in 'sp' alias to save bookmarked paths:
+index=0
+
+## 2017-12-02 - How are these variables used? - TMH
+bash_settings_file="${HOME}/.bash_settings_local"
+
+# --- SCRIPT VARS END ---
 
 echo "starting,"
 
@@ -866,8 +616,6 @@ if [[ "$#" -eq "1" ]]; then
 #    echo "calling 'read directory bookmarks file' with no arguments . . ."
 #    read_bookmarks_file
 fi
-
-
 
 ## Note:  single brackets in the following test work, double brackets
 ##  seem to evaulate differently, may be because we're using a shell
@@ -889,21 +637,11 @@ else
     mkdir -pv ${bookmarks_dir}
 fi
 
-
-
 ##----------------------------------------------------------------------
 ##  STEP:  set shell aliases . . . moved to two functions of this script
 ##----------------------------------------------------------------------
 
-    set_aliases
-
     set_aliases_for_bookmarking
-
-#    echo "- DIAG BEGIN - calling builtin shell command 'alias' to check aliases just set:"
-#    alias
-#    echo "- DIAG END -"
-
-
 
 ##----------------------------------------------------------------------
 ##  STEP - read file holding bookmarked paths
@@ -923,8 +661,6 @@ fi
             bookmarks_group_id=1
         fi
      fi
-
-
 
 ##----------------------------------------------------------------------
 ##  STEP - check for valid bookmarks group identifier, should be
@@ -954,15 +690,11 @@ else
     fi
 fi
 
-
 # echo "calling bash amendments function to read run-time config file . . ."
 # read_bookmarks_runtime_config
 
 echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
 read_bookmarks_file $0 ${bookmarks_group_id}
-
-
-
 
 ## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1:
 
@@ -976,9 +708,6 @@ if [ ]; then
     echo "- DIAG END in main-line code of script -"
     echo ""
 fi
-
-
-
 
 ##----------------------------------------------------------------------
 ##  STEP - amend environment variables
@@ -1006,50 +735,41 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
         amend_path_variable
     fi
 
-
-# Concurrent Versions System (CVS) variables:
-
-    CVSROOT="/home/fulano/cvs"
-    CVS_RSH=""
-#    export EDITOR=/usr/bin/vim . . . commented out 2012-01-25 - TMH
-    export EDITOR=/usr/bin/vi
     HISTSIZE=1000
     HISTFILESIZE=1000
 
-# Variables as shortcuts:
+# ---- DEV 0125 BEGIN -
 
+#// TODO [ ] This looks like it is written to be an alias, but it is not a shell
+#//  alias so annotate it and factor it to an appropriate place in the revamped
+#//  directory bookmarker scripts of 2026:
+# Variables as shortcuts:
     archive=${HOME}/archive
 
-# Enable tsocks transparent proxy service by setting this environment
-# variable:
+# Call directory bookmarks script to set custom aliases:
+if [ -e .bookmarked-paths/scripts/aliases.sh ]; then
+    . .bookmarked-paths/scripts/aliases.sh
+else
+    echo "- NOTICE - no directory bookmarks helper found to set custom aliases"
+fi
 
-## Note - needed back in 2004, 2005 for to enable proxy server
-##  settings . . .
+# ---- DEV 0125 END -
 
-#    export LD_PRELOAD=/lib/libtsocks.so.1.8
-#    export LD_PRELOAD=/usr/lib/libtsocks.so.1.8
+# TODO [ ] Factor exported environment variables to a shell function
 
-
+# TODO [ ] Consider setting editor to /usr/bin/vim, check whether this exists
+#  Debian package vim-tiny is installed by default:
+    export EDITOR=/usr/bin/vi
 
 ##----------------------------------------------------------------------
 ##  2014-02-19 - added by Ted . . .
-##
 ##  STEP - cross compile variables to export
-##
 ##  reference http://www.x.org/wiki/CrossCompilingXorg/
 ##----------------------------------------------------------------------
-
-# export CROSS_COMPILE=arm-none-linux-gnueabi-
 export CROSS_COMPILE=arm-unknown-linux-gnueabi-
 
 export SESSION_MANAGER=lightdm
 
-
-# . ~/.bookmarked-paths/set-proxies.sh
-
-
 echo "done."
-
-
 
 # EOF ( end of file )
