@@ -4,6 +4,13 @@
 # - SECTION - script functions
 # ----------------------------------------------------------------------
 
+function dmsg()
+{
+    if [[ $1 -eq $DIAG_ON ]]; then
+        echo $2
+    fi
+}
+
 function show_aliases_in_this_script()
 {
 ## 2017-12-02 NEED - Contributor Ted noting that following command will
@@ -16,13 +23,9 @@ function show_aliases_in_this_script()
 
 function set_aliases_for_bookmarking()
 {
-#    echo "setting aliases for bookmarking of paths . . ."
-
     alias cb='echo "directory bookmarks group set to group ${bookmarks_group_id},"'
 
-#---------------------------------------------------------------------
 # STEP:  create aliases for saving paths and returning to paths
-#---------------------------------------------------------------------
 
 # setting of bookmarks 1 through 10:
 
@@ -69,13 +72,6 @@ function set_aliases_for_bookmarking()
 #    echo "- TEST - setting alias SD31 . . ."
     alias sd31='echo "Doh, thirty one bookmarks not supported!"'
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## 1024  cd foo; echo $?
-## 1025  cd foo; echo $?; if (( $? && 1 )); then echo "dir not found!"; else echo "now at $PWD"; fi
-## 1026  cd foo; if (( $? && 1 )); then echo "dir not found!"; else echo "now at $PWD"; fi
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-## 2018-07-13 - added by Ted for improved notices when selected dir not found:
 alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not found!"; else echo "now at $PWD"; fi'
 
 # navigation to bookmarked directories 1 through 10:
@@ -125,52 +121,74 @@ alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not 
 ##  Banner message at end of alias 's' . . .
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-echo "M1"
-alias s='\
+DBPS="G${bookmarks_group_id}"
+alias s='
 echo
 echo "Bookmarked paths in bookmarks group ${bookmarks_group_id} are:"
+echo "(use 'gd1', 'gd2', etc to go to bookmarked directory)"
 echo
-\
-echo "variable D1 points to $D1";\
- echo variable D2 points to $D2; echo variable D3 points to $D3; echo variable D4 points to $D4; echo variable D5 points to $D5; echo variable D6 points to $D6; echo variable D7 points to $D7; echo variable D8 points to $D8; echo variable D9 points to $D9; echo variable D10 points to $D10;\
-\
-echo " - - - - -";\
-\
-echo variable D11 points to $D11; echo variable D12 points to $D12; echo variable D13 points to $D13; echo variable D14 points to $D14; echo variable D15 points to $D15; echo variable D16 points to $D16; echo variable D17 points to $D17; echo variable D18 points to $D18; echo variable D19 points to $D19; echo variable D20 points to $D20;\
-\
-echo " - - - - -";\
-\
-echo "variable D21 points to $D21";\
-echo "variable D22 points to $D22";\
-echo "variable D23 points to $D23";\
-echo "variable D24 points to $D24";\
-echo "variable D25 points to $D25";\
-\
-echo "variable D26 points to $D26";\
-echo "variable D27 points to $D27";\
-echo "variable D28 points to $D28";\
-echo "variable D29 points to $D29";\
-echo "variable D30 points to $D30";\
-\
-echo; \
-echo EDITOR is set to: $EDITOR;\
-echo "see file dot-bashrc-amendments.sh, typically in home directory of present user,";\
-echo "for implementation of directory bookmarks and D1..D30 variables - TMH";\
-echo "this shell script written by Ted Havelka and licensed under GNU Public License, 2005 - 2017";\
-\
-echo'
+
+echo "$DBPS _gd1 $D1";
+echo "$DBPS _gd2 $D2";
+echo "$DBPS _gd3 $D3";
+echo "$DBPS _gd4 $D4";
+echo "$DBPS _gd5 $D5";
+
+echo "$DBPS _gd6 $D6";
+echo "$DBPS _gd7 $D7";
+echo "$DBPS _gd8 $D8";
+echo "$DBPS _gd9 $D9";
+echo "$DBPS gd10 $D10";
+
+echo " - - - - -";
+echo "$DBPS gd11 $D11";
+echo "$DBPS gd12 $D12";
+echo "$DBPS gd13 $D13";
+echo "$DBPS gd14 $D14";
+echo "$DBPS gd15 $D15";
+
+echo "$DBPS gd16 $D16";
+echo "$DBPS gd17 $D17";
+echo "$DBPS gd18 $D18";
+echo "$DBPS gd19 $D19";
+echo "$DBPS gd20 $D20";
+
+echo " - - - - -";
+echo "$DBPS gd21 $D21";
+echo "$DBPS gd22 $D22";
+echo "$DBPS gd23 $D23";
+echo "$DBPS gd24 $D24";
+echo "$DBPS gd25 $D25";
+
+echo "$DBPS gd26 $D26";
+echo "$DBPS gd27 $D27";
+echo "$DBPS gd28 $D28";
+echo "$DBPS gd29 $D29";
+echo "$DBPS gd30 $D30";
+echo;
+echo EDITOR is set to: $EDITOR;
+'
 
 ##------------------------------------------------------------------------------
 
 alias sp='bookmarked_path[0]="zztop"; 
-   bookmarked_path[1]=$D1;    bookmarked_path[2]=$D2;    bookmarked_path[3]=$D3;    bookmarked_path[4]=$D4;    bookmarked_path[5]=$D5; 
-   bookmarked_path[6]=$D6;    bookmarked_path[7]=$D7;    bookmarked_path[8]=$D8;    bookmarked_path[9]=$D9;   bookmarked_path[10]=$D10; 
+bookmarked_path[1]=$D1 bookmarked_path[2]=$D2
+bookmarked_path[3]=$D3 bookmarked_path[4]=$D4
+bookmarked_path[5]=$D5 bookmarked_path[6]=$D6
+bookmarked_path[7]=$D7 bookmarked_path[8]=$D8
+bookmarked_path[9]=$D9 bookmarked_path[10]=$D10
 
-  bookmarked_path[11]=$D11;  bookmarked_path[12]=$D12;  bookmarked_path[13]=$D13;  bookmarked_path[14]=$D14;  bookmarked_path[15]=$D15; 
-  bookmarked_path[16]=$D16;  bookmarked_path[17]=$D17;  bookmarked_path[18]=$D18;  bookmarked_path[19]=$D19;  bookmarked_path[20]=$D20; 
+bookmarked_path[11]=$D11 bookmarked_path[12]=$D12
+bookmarked_path[13]=$D13 bookmarked_path[14]=$D14
+bookmarked_path[15]=$D15 bookmarked_path[16]=$D16
+bookmarked_path[17]=$D17 bookmarked_path[18]=$D18
+bookmarked_path[19]=$D19 bookmarked_path[20]=$D20
 
-  bookmarked_path[21]=$D21;  bookmarked_path[22]=$D22;  bookmarked_path[23]=$D23;  bookmarked_path[24]=$D24;  bookmarked_path[25]=$D25; 
-  bookmarked_path[26]=$D26;  bookmarked_path[27]=$D27;  bookmarked_path[28]=$D28;  bookmarked_path[29]=$D29;  bookmarked_path[30]=$D30; 
+bookmarked_path[21]=$D21 bookmarked_path[22]=$D22
+bookmarked_path[23]=$D23 bookmarked_path[24]=$D24
+bookmarked_path[25]=$D25 bookmarked_path[26]=$D26
+bookmarked_path[27]=$D27 bookmarked_path[28]=$D28
+bookmarked_path[29]=$D29 bookmarked_path[30]=$D30
 
 ## 2017-12-14 THU:
   echo "about to save bookmarked paths using old script code in alias," 
@@ -182,75 +200,62 @@ alias sp='bookmarked_path[0]="zztop";
       echo ${bookmarked_path[$index]} >> $filename; 
   done'
 
-# alias clearpaths='\
-# echo "Clearing bookmarked paths in present shell . . ." \
-# echo "Note:  bookmarked paths in bookmarks group ${bookmarks_group_id} still stored in ${filename}" \
-# export D1=""; export D2=""; export D3=""; export D4=""; export D5=""; \
-# export D6=""; export D7=""; export D8=""; export D9=""; export D10=""; \
-# \
-# export D11=""; export D12=""; export D13=""; export D14=""; export D15=""; \
-# export D16=""; export D17=""; export D18=""; export D19=""; export D20=""; \
-# \
-# export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
-# export D26=""; export D27=""; export D28=""; export D29=""; export D30="";'
-
-## 2017-12-14 - unexpected new behavior observed when backslash characters
-##  appear in alias defining statement above, removing those:
-
 alias clearpaths='
 echo "Clearing bookmarked paths in present shell . . ."
 echo "Note:  bookmarked paths in bookmarks group ${bookmarks_group_id} still stored in ${filename}"
-echo "use \`lp${bookmarks_group_id}\` to reload those bookmarked paths."
-export D1=""; export D2=""; export D3=""; export D4=""; export D5=""; \
-export D6=""; export D7=""; export D8=""; export D9=""; export D10=""; \
-\
-export D11=""; export D12=""; export D13=""; export D14=""; export D15=""; \
-export D16=""; export D17=""; export D18=""; export D19=""; export D20=""; \
-\
-export D21=""; export D22=""; export D23=""; export D24=""; export D25=""; \
+echo "use 'lp${bookmarks_group_id}' to reload those bookmarked paths."
+export D1=""; export D2=""; export D3=""; export D4=""; export D5="";
+export D6=""; export D7=""; export D8=""; export D9=""; export D10="";
+
+export D11=""; export D12=""; export D13=""; export D14=""; export D15="";
+export D16=""; export D17=""; export D18=""; export D19=""; export D20="";
+
+export D21=""; export D22=""; export D23=""; export D24=""; export D25="";
 export D26=""; export D27=""; export D28=""; export D29=""; export D30="";'
 
 # 2017-12-02 - NEED TO ADDRESS INTENT AND ACTION OF load-paths:
 # This alias likely doesn't work as intended, to load one set
 # of bookmarked paths over others . . .    - TMH
 
-alias load-paths=' \
-export D1=${bookmarked_path[1]}; \
-export D2=${bookmarked_path[2]}; \
-export D3=${bookmarked_path[3]}; \
-export D4=${bookmarked_path[4]}; \
-export D5=${bookmarked_path[5]}; \
-export D6=${bookmarked_path[6]}; \
-export D7=${bookmarked_path[7]}; \
-export D8=${bookmarked_path[8]}; \
-export D9=${bookmarked_path[9]}; \
-export D10=${bookmarked_path[10]}; \
-\
-export D11=${bookmarked_path[11]}; \
-export D12=${bookmarked_path[12]}; \
-export D13=${bookmarked_path[13]}; \
-export D14=${bookmarked_path[14]}; \
-export D15=${bookmarked_path[15]}; \
-export D16=${bookmarked_path[16]}; \
-export D17=${bookmarked_path[17]}; \
-export D18=${bookmarked_path[18]}; \
-export D19=${bookmarked_path[19]}; \
-export D20=${bookmarked_path[20]}; \
-\
-export D21=${bookmarked_path[21]}; \
-export D22=${bookmarked_path[22]}; \
-export D23=${bookmarked_path[23]}; \
-export D24=${bookmarked_path[24]}; \
-export D25=${bookmarked_path[25]}; \
-export D26=${bookmarked_path[26]}; \
-export D27=${bookmarked_path[27]}; \
-export D28=${bookmarked_path[28]}; \
-export D29=${bookmarked_path[29]}; \
-export D30=${bookmarked_path[30]}; \
+alias load-paths='
+export D1=${bookmarked_path[1]};
+export D2=${bookmarked_path[2]};
+export D3=${bookmarked_path[3]};
+export D4=${bookmarked_path[4]};
+export D5=${bookmarked_path[5]};
+export D6=${bookmarked_path[6]};
+export D7=${bookmarked_path[7]};
+export D8=${bookmarked_path[8]};
+export D9=${bookmarked_path[9]};
+export D10=${bookmarked_path[10]};
+
+export D11=${bookmarked_path[11]};
+export D12=${bookmarked_path[12]};
+export D13=${bookmarked_path[13]};
+export D14=${bookmarked_path[14]};
+export D15=${bookmarked_path[15]};
+export D16=${bookmarked_path[16]};
+export D17=${bookmarked_path[17]};
+export D18=${bookmarked_path[18]};
+export D19=${bookmarked_path[19]};
+export D20=${bookmarked_path[20]};
+
+export D21=${bookmarked_path[21]};
+export D22=${bookmarked_path[22]};
+export D23=${bookmarked_path[23]};
+export D24=${bookmarked_path[24]};
+export D25=${bookmarked_path[25]};
+export D26=${bookmarked_path[26]};
+export D27=${bookmarked_path[27]};
+export D28=${bookmarked_path[28]};
+export D29=${bookmarked_path[29]};
+export D30=${bookmarked_path[30]};
 echo "Loaded user-saved paths:"; s'
 
 # Aliases to load different groups of bookmarked paths:
 
+if [[ 0 ]]; then
+	echo "M1"
     alias lp1='. ${HOME}/dot-bashrc-amendments.sh 1'
     alias lp2='. ${HOME}/dot-bashrc-amendments.sh 2'
     alias lp3='. ${HOME}/dot-bashrc-amendments.sh 3'
@@ -262,6 +267,23 @@ echo "Loaded user-saved paths:"; s'
     alias lp8='. ${HOME}/dot-bashrc-amendments.sh 8'
     alias lp9='. ${HOME}/dot-bashrc-amendments.sh 9'
     alias lp10='. ${HOME}/dot-bashrc-amendments.sh 10'
+fi
+
+# TODO [ ] HIGH PRIORITY find way for script to identify its full path,
+#           so we may remove this hard-coded path:
+
+link_to_dbm="$HOME/projects/directory-book-marker/dbm-main.sh"
+    alias lp1='. $link_to_dbm 1'
+    alias lp2='. $link_to_dbm 2'
+    alias lp3='. $link_to_dbm 3'
+    alias lp4='. $link_to_dbm 4'
+    alias lp5='. $link_to_dbm 5'
+
+    alias lp6='. $link_to_dbm 6'
+    alias lp7='. $link_to_dbm 7'
+    alias lp8='. $link_to_dbm 8'
+    alias lp9='. $link_to_dbm 9'
+    alias lp1link_to_dbm='. $link_to_dbm 1link_to_dbm'
 
 # 2017-12-14 - Alias 'show non-empty bookmarks' added by Ted:
 
@@ -269,51 +291,49 @@ echo "Loaded user-saved paths:"; s'
 echo
 echo "Showing non-empty bookmarks in bookmarks group ${bookmarks_group_id}:"
 echo
- bookmarked_path[1]=$D1;    bookmarked_path[2]=$D2;    bookmarked_path[3]=$D3;    bookmarked_path[4]=$D4;    bookmarked_path[5]=$D5; 
- bookmarked_path[6]=$D6;    bookmarked_path[7]=$D7;    bookmarked_path[8]=$D8;    bookmarked_path[9]=$D9;   bookmarked_path[10]=$D10; 
 
-bookmarked_path[11]=$D11;  bookmarked_path[12]=$D12;  bookmarked_path[13]=$D13;  bookmarked_path[14]=$D14;  bookmarked_path[15]=$D15; 
-bookmarked_path[16]=$D16;  bookmarked_path[17]=$D17;  bookmarked_path[18]=$D18;  bookmarked_path[19]=$D19;  bookmarked_path[20]=$D20; 
+bookmarked_path[1]=$D1; bookmarked_path[2]=$D2;
+bookmarked_path[3]=$D3; bookmarked_path[4]=$D4;
+bookmarked_path[5]=$D5; bookmarked_path[6]=$D6;
+bookmarked_path[7]=$D7; bookmarked_path[8]=$D8;
+bookmarked_path[9]=$D9; bookmarked_path[10]=$D10;
 
-bookmarked_path[21]=$D21;  bookmarked_path[22]=$D22;  bookmarked_path[23]=$D23;  bookmarked_path[24]=$D24;  bookmarked_path[25]=$D25; 
-bookmarked_path[26]=$D26;  bookmarked_path[27]=$D27;  bookmarked_path[28]=$D28;  bookmarked_path[29]=$D29;  bookmarked_path[30]=$D30; 
+bookmarked_path[11]=$D11; bookmarked_path[12]=$D12;
+bookmarked_path[13]=$D13; bookmarked_path[14]=$D14;
+bookmarked_path[15]=$D15; bookmarked_path[16]=$D16;
+bookmarked_path[17]=$D17; bookmarked_path[18]=$D18;
+bookmarked_path[19]=$D19; bookmarked_path[20]=$D20;
+
+bookmarked_path[21]=$D21; bookmarked_path[22]=$D22;
+bookmarked_path[23]=$D23; bookmarked_path[24]=$D24;
+bookmarked_path[25]=$D25; bookmarked_path[26]=$D26;
+bookmarked_path[27]=$D27; bookmarked_path[28]=$D28;
+bookmarked_path[29]=$D29; bookmarked_path[30]=$D30;
 
 for index in 1 2 3 4 5 6 7 8 9 10  11 12 13 14 15 16 17 18 19 20  21 22 23 24 25 26 27 28 29 30; do
 
-    if [ -z ${bookmarked_path[$index]} ]; then
-        echo "bookmarked_path[$index] not set," >> /dev/null
-    else
-        echo "\$D${index} set to ${bookmarked_path[$index]},"
-    fi
+if [ -z ${bookmarked_path[$index]} ]; then
+    echo "bookmarked_path[$index] not set," >> /dev/null
+else
+    echo "\$D${index} set to ${bookmarked_path[$index]},"
+fi
 done
-echo
-echo "Note:  dot-bash-amendments script supports thirty (30) bookmarked paths per bookmarks group."
+
 echo'
 
 }
 
+# TODO [ ] Test how "read runtime config" function works when rc file absent:
+
 function read_bookmarks_runtime_config()
 {
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## VARS BEGIN
-    local rname="read_bookmarks_runtime_config"
     local line="DEFAULT_LINE_TO_BE_READ_FROM_FILE"
     local bookmarks_group_id=""
-## VARS END
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
-#    echo "* * * SCRIPT FUNCTION ${rname}() IMPLEMENTATION UNDERWAY * * *"
-
-    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
+    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_DBM_RC}
 
     if [ -e ${filename} ]; then
-        # read bookmarked paths runtime config file . . .
-#        echo "${rname}:  reading directory bookmarks runtime configuration file ${filename},"
-#        cat ${filename}
-
         read -r line < ${filename}
-#        echo "line 1 holds:  ${line}"
-
     else
         touch ${filename}
         if [ -e ${filename} ]; then
@@ -326,11 +346,7 @@ function read_bookmarks_runtime_config()
     fi
 
     echo ${line}
-## 2017-12-14 - Commented echo statement and variable for later time when
-##  this script able to parse several settings from rc file:
-#    echo ${bookmarks_group_id}
-
-} # end function read_bookmarks_runtime_config()
+}
 
 function write_bookmarks_runtime_config()
 {
@@ -341,10 +357,10 @@ function write_bookmarks_runtime_config()
 ##   elegant way to combine the two functions?  - TMH
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    echo "* * * Script function write_bookmarks_runtime_config() implementation underway * * *"
+    dmsg $DIAG_OFF "* * * function write_bookmarks_runtime_config() implementation underway * * *"
     echo "called with bookmarks group identifier '${1}',"
 
-    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION}
+    filename=${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}/${FILENAME_DBM_RC}
 
     if [ -e ${filename} ]; then
         # write one value bookmarked paths runtime config file, overwriting all data in this file:
@@ -411,19 +427,18 @@ filename__list_of_bookmark_files="${HOME}/bookmarked-path-files.txt"
 
 # REFERENCE:  http://tldp.org/LDP/abs/html/arrays.html
 
-declare -a bookmarked_path=()
+    declare -a bookmarked_path=()
 
-if [ -e ${filename} ]; then
-    bookmarked_path=( $(cat "$filename") )  #  Stores contents of this script
-                                     #+ ($bash_settings_local) in an array.
-else
-#    echo "$O:  no local bash settings file named ${bash_settings_file} found," > /dev/null
-    echo "${SCRIPT_NAME}:  - WARNING - direcory bookmarks file named ${filename} not found!"
-    echo "${SCRIPT_NAME}:  - not able to read in bookmarked directories from this file,"
-    echo "${SCRIPT_NAME}:  - but creating to hold paths going forward . . ."
-    touch ${filename}
-    return
-fi
+    if [ -e ${filename} ]; then
+        bookmarked_path=( $(cat "$filename") )  #  Stores contents of this script
+                                                #+ ($bash_settings_local) in an array.
+    else
+        echo "${SCRIPT_NAME}:  - WARNING - direcory bookmarks file named ${filename} not found!"
+        echo "${SCRIPT_NAME}:  - not able to read in bookmarked directories from this file,"
+        echo "${SCRIPT_NAME}:  - but creating to hold paths going forward . . ."
+        touch ${filename}
+        return
+    fi
 
     if [ ]; then
         echo ""
@@ -435,15 +450,6 @@ fi
         echo "- DIAG END -"
         echo ""
     fi
-
-# 2006-11-27
-# Prior to storing user-saved paths in a local file, path
-# variables were assigned zero-length strings and exported like this:
-#
-# export D1=""
-#
-# Now these variables are exported the same way but assigned
-# differently . . .
 
 # echo "reading saved paths from file, skipping first place-holder token '${bookmarked_path[0]}' . . ."
 
@@ -493,11 +499,10 @@ fi
         echo "- DIAG END -"
         echo ""
     fi
-} # end function read_bookmarks_file()
+}
 
 function clear_paths_function()
 {
-
 #    echo "clear_paths_function:  clearing bookmarked paths in current shell, setting \$D1..\$D30 to '',"
 
     export D1=""; export D2=""; export D3=""; export D4=""; export D5="";
@@ -508,7 +513,6 @@ function clear_paths_function()
 
     export D21=""; export D22=""; export D23=""; export D24=""; export D25="";
     export D26=""; export D27=""; export D28=""; export D29=""; export D30="";
-
 }
 
 function amend_path_variable()
@@ -576,6 +580,9 @@ function restore_path_variable_to_as_found()
 GREP=/bin/grep
 SED=/bin/sed
 
+DIAG_ON=1
+DIAG_OFF=0
+
 SCRIPT_NAME_BY_INVOCATION=$0
 # echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
 SCRIPT_NAME="dot-bash-amendments.sh"
@@ -585,7 +592,7 @@ DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
 
 FILENAME_FORM_OF_BOOKMARKED_PATHS="bookmarked-paths-nn.txt"
 
-FILENAME_OF_BOOKMARKS_RUNTIME_CONFIGURATION="bookmarked-paths.rc"
+FILENAME_DBM_RC="bookmarked-paths.rc"
 
 BOOKMARKS_GROUPS_SUPPORTED="1..9"
 
@@ -624,9 +631,9 @@ fi
 bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
 
 # echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
-## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when 
+## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when
 ## +  the argument to the file test is a zero-length string?  Or undefined variable?
-## +  Does Mendel Cooper's guide explain this behavior?  There was a type 
+## +  Does Mendel Cooper's guide explain this behavior?  There was a typo
 ## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
 
 if [ -e ${bookmarks_dir} ]; then
@@ -641,7 +648,9 @@ fi
 ##  STEP:  set shell aliases . . . moved to two functions of this script
 ##----------------------------------------------------------------------
 
-    set_aliases_for_bookmarking
+# TODO [ ] Determine whether setting aliases can be moved to after readings
+#  file holding latest selected group of dir bookmarks.
+#    set_aliases_for_bookmarking
 
 ##----------------------------------------------------------------------
 ##  STEP - read file holding bookmarked paths
@@ -653,14 +662,18 @@ fi
 
 ##  *  https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
 
-     re='^[0-9]+$'
-     if [[ $1 =~ $re ]]; then
+    re='^[0-9]+$'
+    if [[ $1 =~ $re ]]; then
         if [ "$#" -gt 0 ]; then
             bookmarks_group_id=${1}
         else
             bookmarks_group_id=1
         fi
-     fi
+    fi
+
+    # echo "- DEV 0220 - bookmarks group set to " $bookmarks_group_id
+    # echo "- DEV 0220 - calling function to set bookmarking aliases . . ."
+    # set_aliases_for_bookmarking
 
 ##----------------------------------------------------------------------
 ##  STEP - check for valid bookmarks group identifier, should be
@@ -675,13 +688,10 @@ if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
     write_bookmarks_runtime_config ${bookmarked_paths_group_in_script_main_line}
 else
     if [ -z ${bookmarked_paths_group_in_script_main_line} ]; then
-#        echo "setting bookmarks group to default value of 1, first group of bookmarks among ${BOOKMARKS_GROUPS_SUPPORTED}"
-#        bookmarked_paths_group_in_script_main_line=1
-
-        echo "script called without bookmarked paths group specified,"
-        echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
+        dmsg $DIAG_ON "script called without bookmarked paths group specified,"
+        # echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
         bookmarks_group_id=$(read_bookmarks_runtime_config)
-        echo "- DEV - from rc file read bookmarks group id '${bookmarks_group_id}',"
+        dmsg $DIAG_ON "- DEV - from bookmarks rc file read bookmarks group id '${bookmarks_group_id}',"
     else
         echo "- NOTE - script called with unsupported bookmarks group id,"
         echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
@@ -689,6 +699,10 @@ else
         bookmarked_paths_group_in_script_main_line=1
     fi
 fi
+
+    echo "- DEV 0220 - bookmarks group set to " $bookmarks_group_id
+    echo "- DEV 0220 - calling function to set bookmarking aliases . . ."
+    set_aliases_for_bookmarking
 
 # echo "calling bash amendments function to read run-time config file . . ."
 # read_bookmarks_runtime_config
@@ -755,7 +769,9 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
 if [ -e ./scripts/aliases.sh ]; then
     . ./scripts/aliases.sh
 else
-    echo "- NOTICE - no directory bookmarks helper found to set custom aliases"
+    echo "- WARN - no directory bookmarks helper found to set custom aliases"
+    echo "- INFO - current dir is:"
+    pwd
 fi
 
 # ---- DEV 0125 END -
