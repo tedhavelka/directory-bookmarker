@@ -11,6 +11,15 @@ function dmsg()
     fi
 }
 
+function set_dbm_path()
+{
+    # Note this function needed because .bashrc is called from/in an environment
+    # where `pwd` reports current directory as user's home dir.
+    echo "/home/ted/projects/directory-book-marker"
+}
+
+# TODO [ ] Review following function 'show_aliases_in_this_script()' . . .
+
 function show_aliases_in_this_script()
 {
 ## 2017-12-02 NEED - Contributor Ted noting that following command will
@@ -371,7 +380,7 @@ function write_bookmarks_runtime_config()
         if [ -e ${filename} ]; then
             echo ${1} > ${filename}
         else
-            echo "${SCRIPT_NAME}:  - WARNING - unable to open and unable to create runtime config file!"
+            echo "${SCRIPT_NAME}:  - WARN - unable to open and unable to create runtime config file!"
             echo "${SCRIPT_NAME}:  - will start with bookmarks group set to 1,"
             echo "${SCRIPT_NAME}:  - presently bookmarks groups 1 through 9 supported."
         fi
@@ -389,16 +398,16 @@ function read_bookmarks_file()
 
 REGEX="[1-9]"
     if [[ ${bookmarked_paths_group} =~ ${REGEX} ]] ; then
-        echo "caller requests valid bookmarks file identified by '${2}', which is in the range ${BOOKMARKS_GROUPS_SUPPORTED}"
+        dmsg $DIAG_OFF  "caller requests valid bookmarks file identified by '${2}'"
     else
-        echo "- NOTE - caller requests unsupported or unknown bookmarks file identified by '${2}',"
-        echo "- NOTE - defaulting to read bookmarked directories in bookmarks group 1,"
+        echo "- NOTE - caller requests unsupported bookmarks file identified by '${2}',"
+        echo "- NOTE - reading bookmarks from default group 1 . . ."
         bookmarked_paths_group=1
     fi
 
     bookmarks_filename=$(echo ${FILENAME_FORM_OF_BOOKMARKED_PATHS} | ${SED} s/nn/0${bookmarked_paths_group}/)
 
-    echo "will read bookmarks from file named ${bookmarks_filename},"
+    dmsg $DIAG_OFF "will read bookmarks from file named ${bookmarks_filename},"
 
 ## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ##  NOTE - had trouble getting these export statements to fly . . .
@@ -433,7 +442,7 @@ filename__list_of_bookmark_files="${HOME}/bookmarked-path-files.txt"
         bookmarked_path=( $(cat "$filename") )  #  Stores contents of this script
                                                 #+ ($bash_settings_local) in an array.
     else
-        echo "${SCRIPT_NAME}:  - WARNING - direcory bookmarks file named ${filename} not found!"
+        echo "${SCRIPT_NAME}:  - WARN - direcory bookmarks file named ${filename} not found!"
         echo "${SCRIPT_NAME}:  - not able to read in bookmarked directories from this file,"
         echo "${SCRIPT_NAME}:  - but creating to hold paths going forward . . ."
         touch ${filename}
@@ -572,10 +581,8 @@ function restore_path_variable_to_as_found()
 }
 
 # ----------------------------------------------------------------------
-# - SECTION - akin to int main
+# - SECTION - variables
 # ----------------------------------------------------------------------
-
-# --- SCRIPT VARS BEGIN ---
 
 GREP=/bin/grep
 SED=/bin/sed
@@ -608,20 +615,14 @@ index=0
 ## 2017-12-02 - How are these variables used? - TMH
 bash_settings_file="${HOME}/.bash_settings_local"
 
-# --- SCRIPT VARS END ---
+# ----------------------------------------------------------------------
+# - SECTION - akin to int main
+# ----------------------------------------------------------------------
 
 echo "starting,"
 
-## Following test fails when script passed an argument, should succeed . . .
-#if [[ "$ARGC" -eq "1" ]]; then
-#    echo "called with first argument set to '$1',"
-#fi
-
-## Following test succeeds:
 if [[ "$#" -eq "1" ]]; then
-    echo "called with first argument set to '$1',"
-#    echo "calling 'read directory bookmarks file' with no arguments . . ."
-#    read_bookmarks_file
+    echo "called with one argument which is set to '$1',"
 fi
 
 ## Note:  single brackets in the following test work, double brackets
@@ -645,20 +646,10 @@ else
 fi
 
 ##----------------------------------------------------------------------
-##  STEP:  set shell aliases . . . moved to two functions of this script
-##----------------------------------------------------------------------
-
-# TODO [ ] Determine whether setting aliases can be moved to after readings
-#  file holding latest selected group of dir bookmarks.
-#    set_aliases_for_bookmarking
-
-##----------------------------------------------------------------------
 ##  STEP - read file holding bookmarked paths
 ##----------------------------------------------------------------------
 
-#    echo "- DIAG BEGIN - calling function (not alias) to clear any directory bookmarks . . ."
     clear_paths_function
-#    echo "- DIAG END - \$D1 holds '$D1'"
 
 ##  *  https://stackoverflow.com/questions/806906/how-do-i-test-if-a-variable-is-a-number-in-bash
 
@@ -670,10 +661,6 @@ fi
             bookmarks_group_id=1
         fi
     fi
-
-    # echo "- DEV 0220 - bookmarks group set to " $bookmarks_group_id
-    # echo "- DEV 0220 - calling function to set bookmarking aliases . . ."
-    # set_aliases_for_bookmarking
 
 ##----------------------------------------------------------------------
 ##  STEP - check for valid bookmarks group identifier, should be
@@ -688,10 +675,10 @@ if [[ ${bookmarked_paths_group_in_script_main_line} =~ [1-9] ]] ; then
     write_bookmarks_runtime_config ${bookmarked_paths_group_in_script_main_line}
 else
     if [ -z ${bookmarked_paths_group_in_script_main_line} ]; then
-        dmsg $DIAG_ON "script called without bookmarked paths group specified,"
+        dmsg $DIAG_OFF "script called without bookmarked paths group specified,"
         # echo "looking for last-used bookmarks group in dot-bash-amendments run-time config file . . ."
         bookmarks_group_id=$(read_bookmarks_runtime_config)
-        dmsg $DIAG_ON "- DEV - from bookmarks rc file read bookmarks group id '${bookmarks_group_id}',"
+        dmsg $DIAG_OFF "- DEV - from bookmarks rc file read bookmarks group id '${bookmarks_group_id}',"
     else
         echo "- NOTE - script called with unsupported bookmarks group id,"
         echo "- NOTE - id we got is '${bookmarked_paths_group_in_script_main_line}',"
@@ -700,8 +687,8 @@ else
     fi
 fi
 
-    echo "- DEV 0220 - bookmarks group set to " $bookmarks_group_id
-    echo "- DEV 0220 - calling function to set bookmarking aliases . . ."
+    dmsg $DIAG_OFF "- DEV 0220 - bookmarks group set to " $bookmarks_group_id
+    dmsg $DIAG_OFF "- DEV 0220 - calling function to set bookmarking aliases . . ."
     set_aliases_for_bookmarking
 
 # echo "calling bash amendments function to read run-time config file . . ."
@@ -709,19 +696,6 @@ fi
 
 echo "calling 'read directory bookmarks file' with arguments '$0 ${bookmarks_group_id}' . . ."
 read_bookmarks_file $0 ${bookmarks_group_id}
-
-## See http://tldp.org/LDP/abs/html/testconstructs.html, example script 7-1:
-
-if [ ]; then
-    echo ""
-    echo "- DIAG START in main-line code of script -"
-    echo "back from call to read_bookmarks_file() which exports \$D1..\$D30,"
-    echo "\$D1 holds '$D1',"
-    echo "\$D2 holds '$D2',"
-    echo "\$D3 holds '$D3',"
-    echo "- DIAG END in main-line code of script -"
-    echo ""
-fi
 
 ##----------------------------------------------------------------------
 ##  STEP - amend environment variables
@@ -749,10 +723,9 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
         amend_path_variable
     fi
 
+    # TODO [ ] Check whether both these history variables are necessary:
     HISTSIZE=1000
     HISTFILESIZE=1000
-
-# ---- DEV 0125 BEGIN -
 
 #// TODO [ ] This looks like it is written to be an alias, but it is not a shell
 #//  alias so annotate it and factor it to an appropriate place in the revamped
@@ -762,19 +735,19 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
 
 # Call directory bookmarks script to set custom aliases:
 
-## if [ -e .bookmarked-paths/scripts/aliases.sh ]; then
-##     . .bookmarked-paths/scripts/aliases.sh
-## else
+# Note this may be a dev-only necesity, to set directory bookmarker path
+# manually:
+bookmarks_helpers_dir=`set_dbm_path`
+aliases_file=$bookmarks_helpers_dir/scripts/aliases.sh
 
-if [ -e ./scripts/aliases.sh ]; then
-    . ./scripts/aliases.sh
+if [ -e $aliases_file ]; then
+    . $aliases_file
 else
     echo "- WARN - no directory bookmarks helper found to set custom aliases"
-    echo "- INFO - current dir is:"
+    echo "- WARN - tried $aliases_file"
+    echo "- WARN - current dir is:"
     pwd
 fi
-
-# ---- DEV 0125 END -
 
 # TODO [ ] Factor exported environment variables to a shell function
 
@@ -782,15 +755,4 @@ fi
 #  Debian package vim-tiny is installed by default:
     export EDITOR=/usr/bin/vi
 
-##----------------------------------------------------------------------
-##  2014-02-19 - added by Ted . . .
-##  STEP - cross compile variables to export
-##  reference http://www.x.org/wiki/CrossCompilingXorg/
-##----------------------------------------------------------------------
-export CROSS_COMPILE=arm-unknown-linux-gnueabi-
-
-export SESSION_MANAGER=lightdm
-
-echo "done."
-
-# EOF ( end of file )
+# echo "done."
