@@ -10,6 +10,22 @@ function lstty()
     ls -lt /dev/ttyACM* /dev/ttyUSB*
 }
 
+function lgrep()
+{
+	grep -nr \
+	--exclude-dir=.git \
+	--exclude-dir=build \
+	--exclude-dir=docker_cache \
+	--exclude-dir=tests \
+	--exclude-dir=twister-out* \
+	$1 | grep $1
+}
+
+function gla()
+{
+    git log --all --graph --oneline
+}
+
 function set_aliases()
 {
 ##----------------------------------------------------------------------
