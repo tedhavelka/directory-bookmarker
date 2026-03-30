@@ -15,7 +15,7 @@ function set_dbm_path()
 {
     # Note this function needed because .bashrc is called from/in an environment
     # where `pwd` reports current directory as user's home dir.
-    echo "/home/ted/projects/directory-book-marker"
+    echo "/home/$USER/projects/directory-book-marker"
 }
 
 # TODO [ ] Review following function 'show_aliases_in_this_script()' . . .
@@ -735,16 +735,25 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
 
 # Call directory bookmarks script to set custom aliases:
 
-# Note this may be a dev-only necesity, to set directory bookmarker path
-# manually:
-bookmarks_helpers_dir=`set_dbm_path`
-aliases_file=$bookmarks_helpers_dir/scripts/aliases.sh
+# TODO [ ] Clean up way to define and try locations of directory bookmarks
+#           scripts:
 
-if [ -e $aliases_file ]; then
-    . $aliases_file
+ORIGINAL_DBM_DIR=.bookmarked-paths
+BOOKMARKS_HELPERS_DIR1=`set_dbm_path`
+BOOKMARKS_HELPERS_DIR2=$HOME/$ORIGINAL_DBM_DIR
+
+ALIASES_SUB_SCRIPT=scripts/aliases.sh
+
+if [ -e $BOOKMARKS_HELPERS_DIR1/$ALIASES_SUB_SCRIPT ]; then
+    echo "- DEV 0330 - Found helper aliases file in $BOOKMARKS_HELPERS_DIR1"
+    . $BOOKMARKS_HELPERS_DIR1/$ALIASES_SUB_SCRIPT
+elif [ -e $BOOKMARKS_HELPERS_DIR2/$ALIASES_SUB_SCRIPT ]; then
+    echo "- DEV 0330 - Found helper aliases file in $BOOKMARKS_HELPERS_DIR2"
+    . $BOOKMARKS_HELPERS_DIR2/$ALIASES_SUB_SCRIPT
 else
     echo "- WARN - no directory bookmarks helper found to set custom aliases"
-    echo "- WARN - tried $aliases_file"
+    echo "- WARN - tried $BOOKMARKS_HELPERS_DIR1/$ALIASES_SUB_SCRIPT"
+    echo "- WARN - tried $BOOKMARKS_HELPERS_DIR2/$ALIASES_SUB_SCRIPT"
     echo "- WARN - current dir is:"
     pwd
 fi
