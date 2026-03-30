@@ -263,21 +263,6 @@ echo "Loaded user-saved paths:"; s'
 
 # Aliases to load different groups of bookmarked paths:
 
-if [[ 0 ]]; then
-	echo "M1"
-    alias lp1='. ${HOME}/dot-bashrc-amendments.sh 1'
-    alias lp2='. ${HOME}/dot-bashrc-amendments.sh 2'
-    alias lp3='. ${HOME}/dot-bashrc-amendments.sh 3'
-    alias lp4='. ${HOME}/dot-bashrc-amendments.sh 4'
-    alias lp5='. ${HOME}/dot-bashrc-amendments.sh 5'
-
-    alias lp6='. ${HOME}/dot-bashrc-amendments.sh 6'
-    alias lp7='. ${HOME}/dot-bashrc-amendments.sh 7'
-    alias lp8='. ${HOME}/dot-bashrc-amendments.sh 8'
-    alias lp9='. ${HOME}/dot-bashrc-amendments.sh 9'
-    alias lp10='. ${HOME}/dot-bashrc-amendments.sh 10'
-fi
-
 # TODO [ ] HIGH PRIORITY find way for script to identify its full path,
 #           so we may remove this hard-coded path:
 
@@ -310,6 +295,7 @@ fi
     alias lp7='. $DBM_SCRIPT 7'
     alias lp8='. $DBM_SCRIPT 8'
     alias lp9='. $DBM_SCRIPT 9'
+    alias lp10='. $DBM_SCRIPT 10'
 
 # 2017-12-14 - Alias 'show non-empty bookmarks' added by Ted:
 
@@ -598,7 +584,7 @@ function restore_path_variable_to_as_found()
 }
 
 # ----------------------------------------------------------------------
-# - SECTION - variables
+# - SECTION - Variables
 # ----------------------------------------------------------------------
 
 GREP=/bin/grep
@@ -608,8 +594,9 @@ DIAG_ON=1
 DIAG_OFF=0
 
 SCRIPT_NAME_BY_INVOCATION=$0
+
 # echo "\$SCRIPT_NAME assigned value of \${0} and holds ${SCRIPT_NAME},"
-SCRIPT_NAME="dot-bash-amendments.sh"
+SCRIPT_NAME="dbm-main.sh"
 SCRIPT_ABBR="dbm"
 
 DIRECTORY_OF_BOOKMARKS_FILES=".bookmarked-paths"
@@ -632,8 +619,17 @@ index=0
 ## 2017-12-02 - How are these variables used? - TMH
 bash_settings_file="${HOME}/.bash_settings_local"
 
+# TODO [ ] Upper case following variable
+bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
+
+ORIGINAL_DBM_DIR=.bookmarked-paths
+BOOKMARKS_HELPERS_DIR1=`set_dbm_path`
+BOOKMARKS_HELPERS_DIR2=$HOME/$ORIGINAL_DBM_DIR
+
+ALIASES_SUB_SCRIPT=scripts/aliases.sh
+
 # ----------------------------------------------------------------------
-# - SECTION - akin to int main
+# - SECTION - Start of script - akin to int main
 # ----------------------------------------------------------------------
 
 echo "starting,"
@@ -646,8 +642,6 @@ fi
 ##  seem to evaulate differently, may be because we're using a shell
 ##  file test . . .
 
-bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
-
 # echo "- DEV - constructed bookmarked paths directory which holds '$bookmarks_dir',"
 ## 2017-12-03 - DISCOVERY:  hey why does bash 'file exists' test return true when
 ## +  the argument to the file test is a zero-length string?  Or undefined variable?
@@ -655,10 +649,8 @@ bookmarks_dir="${HOME}/${DIRECTORY_OF_BOOKMARKS_FILES}"
 ## +  just below with 'bookmarks_dir' spelled 'booksmarks_dir' . . .  - TMH
 
 if [ -e ${bookmarks_dir} ]; then
-#    echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory."
     echo "found directory '${bookmarks_dir}' for bookmarked path files, not creating this directory." > /dev/null
 else
-#    echo "creating directory ${bookmarks_dir} . . ."
     mkdir -pv ${bookmarks_dir}
 fi
 
@@ -734,7 +726,8 @@ read_bookmarks_file $0 ${bookmarks_group_id}
 # Amending the default path variable:
 
     if [ "$1" == "restore-path-variable" ]; then 
-echo "- dbm - RESTORING PATH VARIABLE . . ."
+        # echo "- dbm - RESTORING PATH VARIABLE . . ."
+        echo "- $0 - RESTORING PATH VARIABLE . . ."
         restore_path_variable_to_as_found
     else
         amend_path_variable
@@ -755,12 +748,6 @@ echo "- dbm - RESTORING PATH VARIABLE . . ."
 # TODO [ ] Clean up way to define and try locations of directory bookmarks
 #           scripts:
 
-ORIGINAL_DBM_DIR=.bookmarked-paths
-BOOKMARKS_HELPERS_DIR1=`set_dbm_path`
-BOOKMARKS_HELPERS_DIR2=$HOME/$ORIGINAL_DBM_DIR
-
-ALIASES_SUB_SCRIPT=scripts/aliases.sh
-
 if [ -e $BOOKMARKS_HELPERS_DIR1/$ALIASES_SUB_SCRIPT ]; then
     echo "- DEV 0330 - Found helper aliases file in $BOOKMARKS_HELPERS_DIR1"
     . $BOOKMARKS_HELPERS_DIR1/$ALIASES_SUB_SCRIPT
@@ -780,5 +767,8 @@ fi
 # TODO [ ] Consider setting editor to /usr/bin/vim, check whether this exists
 #  Debian package vim-tiny is installed by default:
     export EDITOR=/usr/bin/vi
+
+# Set aliases for safer shell use and some conveniences
+set_aliases
 
 # echo "done."
