@@ -133,7 +133,7 @@ alias announce_new_dir='if (( $? && 1 )); then echo "- ${SCRIPT_ABBR} - dir not 
 DBPS="G${bookmarks_group_id}"
 alias s='
 echo
-echo "Bookmarked paths in bookmarks group ${bookmarks_group_id} are:"
+echo "- DEV 1 - Bookmarked paths in bookmarks group ${bookmarks_group_id} are:"
 echo "(use 'gd1', 'gd2', etc to go to bookmarked directory)"
 echo
 
@@ -281,24 +281,41 @@ fi
 # TODO [ ] HIGH PRIORITY find way for script to identify its full path,
 #           so we may remove this hard-coded path:
 
-link_to_dbm="$HOME/projects/directory-book-marker/dbm-main.sh"
-    alias lp1='. $link_to_dbm 1'
-    alias lp2='. $link_to_dbm 2'
-    alias lp3='. $link_to_dbm 3'
-    alias lp4='. $link_to_dbm 4'
-    alias lp5='. $link_to_dbm 5'
+DBM_SCRIPT_DIR1=$HOME/.bookmarked-paths
+DBM_SCRIPT_DIR2=$HOME/projects/directory-bookmarker
+DBM_SCRIPT_DIR3=$HOME/workspace/directory-bookmarker
 
-    alias lp6='. $link_to_dbm 6'
-    alias lp7='. $link_to_dbm 7'
-    alias lp8='. $link_to_dbm 8'
-    alias lp9='. $link_to_dbm 9'
-    alias lp1link_to_dbm='. $link_to_dbm 1link_to_dbm'
+DBM_SCRIPT_NAME=dbm-main.sh
+
+unset DBM_SCRIPT
+
+if [ -e $DBM_SCRIPT_DIR1/$DBM_SCRIPT_NAME ]; then
+    DBM_SCRIPT=$DBM_SCRIPT_DIR1/$DBM_SCRIPT_NAME
+elif [ -e $DBM_SCRIPT_DIR2/$DBM_SCRIPT_NAME ]; then
+    DBM_SCRIPT=$DBM_SCRIPT_DIR2/$DBM_SCRIPT_NAME
+elif [ -e $DBM_SCRIPT_DIR3/$DBM_SCRIPT_NAME ]; then
+    DBM_SCRIPT=$DBM_SCRIPT_DIR3/$DBM_SCRIPT_NAME
+else
+    echo "Failed to find primary directory bookmarker script"
+    exit -ENOENT
+fi
+
+    alias lp1='. $DBM_SCRIPT 1'
+    alias lp2='. $DBM_SCRIPT 2'
+    alias lp3='. $DBM_SCRIPT 3'
+    alias lp4='. $DBM_SCRIPT 4'
+    alias lp5='. $DBM_SCRIPT 5'
+
+    alias lp6='. $DBM_SCRIPT 6'
+    alias lp7='. $DBM_SCRIPT 7'
+    alias lp8='. $DBM_SCRIPT 8'
+    alias lp9='. $DBM_SCRIPT 9'
 
 # 2017-12-14 - Alias 'show non-empty bookmarks' added by Ted:
 
-    alias sne='
+    alias se='
 echo
-echo "Showing non-empty bookmarks in bookmarks group ${bookmarks_group_id}:"
+echo "Existing bookmarks in group ${bookmarks_group_id}:"
 echo
 
 bookmarked_path[1]=$D1; bookmarked_path[2]=$D2;
